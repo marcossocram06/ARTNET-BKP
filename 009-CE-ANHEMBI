@@ -1,0 +1,1000 @@
+add connect-to=207.248.10.141 disabled=no name=pptp-BFP1 password=\
+    procyon-mon123 profile=default user=procyon-mon
+/routing ospf area
+add area-id=0.0.0.1 default-cost=1 inject-summary-lsas=yes name=area1 type=stub
+/routing ospf instance
+set [ find default=yes ] redistribute-connected=as-type-1 redistribute-static=\
+    as-type-1 router-id=10.255.255.9
+/routing ospf-v3 instance
+set [ find default=yes ] redistribute-connected=as-type-1 redistribute-static=\
+    as-type-1 router-id=10.255.255.9
+/snmp community
+set [ find default=yes ] disabled=yes
+add addresses=168.228.184.78/32 name=artnet
+/interface bridge port
+add bridge=bridge1 disabled=yes interface=ether1
+add bridge=bridge1 disabled=yes interface=sfp-sfpplus2
+add bridge=bridge1 interface=sfp-sfpplus3
+add bridge=bridge1 interface=sfp-sfpplus5
+add bridge=bridge1 disabled=yes interface=sfp-sfpplus6
+add bridge=bridge1 interface=sfp-sfpplus7
+add bridge=bridge1 interface=sfp-sfpplus8
+add bridge=bridge1 interface=sfp-sfpplus9
+add bridge=bridge1 interface=sfp-sfpplus10
+add bridge=bridge1 interface=sfp-sfpplus11
+add bridge=bridge1 disabled=yes interface=sfp-sfpplus12
+add bridge=bridge1 interface=sfp28-1
+add bridge=bridge1 interface=sfp28-2
+add bridge=bridge1 disabled=yes interface=sfp-sfpplus1
+/ip firewall connection tracking
+set enabled=yes
+/ip neighbor discovery-settings
+set discover-interface-list=all protocol=cdp,mndp
+/interface l2tp-server server
+set enabled=yes use-ipsec=yes
+/interface list member
+add list=LAN
+add interface=bridge1 list=LAN
+add interface=ether1 list=WAN
+/interface ovpn-server server
+set auth=sha1 certificate=server cipher=aes256 enabled=yes port=51194 \
+    require-client-certificate=yes
+/interface pppoe-server server
+add authentication=pap default-profile=PPPoE disabled=no interface=\
+    VLAN-100-UPLINK max-mru=1492 max-mtu=1492 one-session-per-host=yes \
+    service-name=service1
+add authentication=pap default-profile=PPPoE disabled=no interface=sfp-sfpplus1 \
+    max-mru=1492 max-mtu=1492 one-session-per-host=yes service-name=service3
+add authentication=pap default-profile=PPPoE disabled=no interface=\
+    VLAN-101-UPLINK max-mru=1492 max-mtu=1492 one-session-per-host=yes \
+    service-name=service4
+add authentication=pap default-profile=PPPoE disabled=no interface=sfp-sfpplus2
+/interface pptp-server server
+set enabled=yes
+/interface sstp-server server
+set default-profile=default-encryption enabled=yes
+/ip address
+add address=172.30.1.2/30 comment=LINK disabled=yes interface=sfp-sfpplus1 \
+    network=172.30.1.0
+add address=10.255.255.9 interface=Loopback network=10.255.255.9
+add address=10.55.55.1/30 comment=GERENCIA interface=VLAN-10-GERENCIA-OLT \
+    network=10.55.55.0
+add address=172.30.31.254/24 disabled=yes interface=VLAN-101-UPLINK network=\
+    172.30.31.0
+add address=172.31.254.45/30 comment="Speed Test werix-23/03/2022" interface=\
+    ether1 network=172.31.254.44
+add address=172.30.32.254/24 comment="GERENCIAMENTO RADIO" interface=\
+    sfp-sfpplus2 network=172.30.32.0
+add address=172.30.31.1/24 comment="GERENCIAMENTO RADIO" disabled=yes \
+    interface=sfp-sfpplus1 network=172.30.31.0
+add address=186.219.234.20 interface=Loopback network=186.219.234.20
+add address=172.30.31.254/24 comment="GERENCIAMENTO RADIO" interface=\
+    sfp-sfpplus2 network=172.30.31.0
+add address=10.69.0.14/29 comment=LINK interface=sfp-sfpplus1 network=10.69.0.8
+add address=10.69.0.9/29 disabled=yes interface=vlan3004 network=10.69.0.8
+add address=10.99.100.1/24 comment=IP-SERVIDOR-SPEEDTEST interface=ether1 \
+    network=10.99.100.0
+add address=10.99.101.1/30 comment=IP-SERVIDOR-SPEEDTEST interface=sfp-sfpplus6 \
+    network=10.99.101.0
+/ip cloud
+set ddns-enabled=yes update-time=no
+/ip dhcp-client
+add default-route-distance=111 disabled=no interface=ether1 use-peer-ntp=no
+/ip dns
+set servers=8.8.8.8,8.8.4.4
+/ip firewall address-list
+add address=200.130.5.8 list="SAIR BFT"
+add address=161.148.164.31 disabled=yes list="SAIR BFT"
+add address=20.226.97.70 comment=site list="SAIR BFT"
+add address=207.248.10.142 comment="IXCProvedor endereco IP do sistema" list=\
+    rede_local
+/ip firewall filter
+add action=accept chain=forward dst-address=20.226.97.70
+add action=accept chain=forward dst-address=186.219.234.20 dst-port=5060 \
+    protocol=tcp
+add action=accept chain=forward dst-address=186.219.234.20 dst-port=8080 \
+    protocol=tcp
+add action=drop chain=forward src-address=172.21.12.0/24
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 protocol=tcp src-address=172.21.12.0/24
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 protocol=tcp src-address-list=aviso_bloqueio
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-port=!53 protocol=udp src-address=172.21.12.0/24
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-port=!53 protocol=udp src-address-list=aviso_bloqueio
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    protocol=tcp src-address=172.22.12.0/24
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    protocol=tcp src-address-list=aguardando_assinatura
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-port=!53 protocol=udp \
+    src-address=172.22.12.0/24
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-port=!53 protocol=udp \
+    src-address-list=aguardando_assinatura
+/ip firewall mangle
+add action=mark-connection chain=input in-interface=ether1 new-connection-mark=\
+    LINK-ADSL passthrough=yes
+add action=mark-connection chain=input in-interface=sfp-sfpplus1 \
+    new-connection-mark=LINK-BFT1 passthrough=yes
+/ip firewall nat
+add action=dst-nat chain=dstnat disabled=yes dst-port=53 protocol=udp \
+    to-addresses=8.8.8.8 to-ports=53
+add action=masquerade chain=srcnat out-interface=ether1
+add action=src-nat chain=srcnat comment="ACIMA \C9 BACKUP" src-address=\
+    100.64.13.0/24 to-addresses=186.219.234.20/30
+add action=src-nat chain=srcnat src-address=10.99.100.2 to-addresses=\
+    186.219.234.20
+add action=src-nat chain=srcnat src-address=100.200.13.0/24 to-addresses=\
+    186.219.234.20/30
+add action=masquerade chain=srcnat disabled=yes out-interface-list=WAN
+add action=dst-nat chain=dstnat dst-address=186.219.234.20 dst-port=65006 \
+    protocol=tcp to-addresses=192.168.1.252 to-ports=22
+add action=dst-nat chain=dstnat comment="ST WEB" dst-address=186.219.234.20 \
+    dst-port=8080 protocol=tcp to-addresses=10.99.100.2 to-ports=8080
+add action=dst-nat chain=dstnat comment="ST WEB" dst-address=186.219.234.20 \
+    dst-port=5060 protocol=tcp to-addresses=10.99.100.2 to-ports=5060
+add action=masquerade chain=srcnat comment="masq. vpn traffic" src-address=\
+    192.168.89.0/24
+add action=dst-nat chain=dstnat dst-address=186.219.234.20 dst-port=64100 \
+    protocol=tcp to-addresses=10.69.0.11 to-ports=80
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso atraso" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address=\
+    172.20.12.0/24 to-addresses=207.248.10.142 to-ports=8083
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso atraso" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address-list=\
+    aviso_atraso to-addresses=207.248.10.142 to-ports=8083
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address=\
+    172.21.12.0/24 to-addresses=207.248.10.142 to-ports=8082
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address-list=\
+    aviso_bloqueio to-addresses=207.248.10.142 to-ports=8082
+add action=dst-nat chain=dstnat comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    dst-port=80 protocol=tcp src-address=172.22.12.0/24 to-addresses=\
+    207.248.10.142 to-ports=8086
+add action=dst-nat chain=dstnat comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    dst-port=80 protocol=tcp src-address-list=aguardando_assinatura \
+    to-addresses=207.248.10.142 to-ports=8086
+add action=src-nat chain=srcnat comment=NAT-OVPN src-address=10.190.180.0/24 \
+    to-addresses=186.219.234.20
+/ip firewall raw
+add action=accept chain=prerouting protocol=ospf
+add action=accept chain=output protocol=ospf
+/ip route
+add disabled=yes distance=1 dst-address=177.20.169.2/32 gateway=192.168.200.1
+add distance=1 dst-address=186.219.234.20/30 type=blackhole
+add comment="rota tunnel vai para ixc" disabled=yes distance=1 dst-address=\
+    207.248.10.140/30 gateway=10.15.5.55
+add check-gateway=ping disabled=yes distance=1 dst-address=207.248.10.142/32 \
+    gateway=10.15.5.55 scope=10
+add check-gateway=ping disabled=yes distance=2 dst-address=207.248.10.142/32 \
+    gateway=10.69.0.9
+/ip service
+set telnet disabled=yes
+set ftp address=191.252.60.142/32
+set www port=8010
+set ssh disabled=yes
+set api address=191.252.60.142/32,207.248.10.142/32
+set winbox port=8260
+set api-ssl disabled=yes
+/ipv6 address
+add address=2804:2178:404::2/126 advertise=no interface=sfp-sfpplus1
+add address=2804:2178:404::1001/120 advertise=no interface=ether1
+/ipv6 route
+add distance=1 gateway=2804:2178:404::1
+/ppp aaa
+set interim-update=20m use-radius=yes
+/ppp secret
+add name=roteador password=roteador profile=PPPoE service=pppoe
+add name=gui password=gui15172526 profile=PPPoE service=pppoe
+add name=matheus.oliveira password=bandeira profile=PPPoE service=pppoe
+add name=ppnetwork password=123@mudar service=pppoe
+add local-address=10.255.255.9 name=diego.leme45 password=81g13 profile=PPPoE \
+    remote-address=100.64.13.10 service=pppoe
+add name=teste123 password=teste123 service=pppoe
+add name=isabela.rando835 password=izhe2 profile=PPPoE service=pppoe
+add name=vpn-procyon password=1q2w3e4r5T!@# profile=PPPoE service=l2tp
+add name=teste password=teste123 service=pppoe
+add name=vpn
+add name=cleverson.teste password=teste service=pppoe
+add name=procyon-vpn password=.12qwaszx. profile=VPN-Profile service=ovpn
+add caller-id=00:27:22:32:BA:D6 comment="{IXCSoft PPPOE -> leandro.souza2}" \
+    disabled=yes name=leandro.souza2 password=96r37 profile=5_Megas_rural_90 \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> jessica.lisboa25}" disabled=yes name=\
+    jessica.lisboa25 password=r1f79 profile=Piramboia_Fibra_80MB service=pppoe
+add caller-id=E0:19:54:CD:DF:9F comment="{IXCSoft PPPOE -> elaine.mendes54}" \
+    disabled=yes name=elaine.mendes54 password=pj83c profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=04:25:E0:AE:DE:A4 comment="{IXCSoft PPPOE -> carlos.campos94}" \
+    disabled=yes name=carlos.campos94 password=9cr37 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=80:2A:A8:66:8A:82 comment="{IXCSoft PPPOE -> claudemir.benedito}" \
+    disabled=yes name=claudemir.benedito password=v2811 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=94:E3:EE:21:E2:0A comment="{IXCSoft PPPOE -> leticia.silva16}" \
+    disabled=yes name=leticia.silva16 password=v3aii profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=78:8A:20:34:87:E2 comment=\
+    "{IXCSoft PPPOE -> bernadete.nascimento18}" disabled=yes name=\
+    bernadete.nascimento18 password=7vlhm profile=Alpes_10MB_90 service=pppoe
+add caller-id=24:A4:3C:EE:59:41 comment="{IXCSoft PPPOE -> herminio.zan}" \
+    disabled=yes name=herminio.zan password=xr234 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=78:8A:20:96:75:EE comment="{IXCSoft PPPOE -> gervasio.silva20}" \
+    disabled=yes name=gervasio.silva20 password=2f585 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=AC:84:C6:48:1B:DB comment="{IXCSoft PPPOE -> tiago.pedroso22}" \
+    disabled=yes name=tiago.pedroso22 password=zy82h profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=00:27:22:6E:7B:06 comment="{IXCSoft PPPOE -> luis.ramos28}" \
+    disabled=yes name=luis.ramos28 password=84157 profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> marcieli.job30}" disabled=yes name=\
+    marcieli.job30 password=dn8fv profile=pool_bloqueio service=pppoe
+add caller-id=44:D9:E7:7C:D3:F6 comment="{IXCSoft PPPOE -> moacir.silva31}" \
+    disabled=yes name=moacir.silva31 password=egra7 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=44:D9:E7:4A:49:8C comment="{IXCSoft PPPOE -> leidiane.brito32}" \
+    disabled=yes name=leidiane.brito32 password=e8858 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=00:27:22:76:81:B4 comment="{IXCSoft PPPOE -> mauricio.vicente33}" \
+    disabled=yes name=mauricio.vicente33 password=r92au profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:8A:20:98:0F:0E comment="{IXCSoft PPPOE -> vera.ferreira34}" \
+    disabled=yes name=vera.ferreira34 password=vw37t profile=10_MB_90 service=\
+    pppoe
+add caller-id=DC:9F:DB:36:CA:20 comment="{IXCSoft PPPOE -> gina.deus46}" \
+    disabled=yes name=gina.deus46 password=83u9k profile=Alpes_10MB_90 service=\
+    pppoe
+add caller-id=44:D9:E7:24:A4:BE comment="{IXCSoft PPPOE -> valdeci.franco47}" \
+    disabled=yes name=valdeci.franco47 password=93574 profile=10_MB_90 service=\
+    pppoe
+add caller-id=E0:1F:ED:14:10:E1 comment="{IXCSoft PPPOE -> maria.caroline48}" \
+    disabled=yes name=maria.caroline48 password=ew195 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=24:A4:3C:D0:7E:11 comment="{IXCSoft PPPOE -> marcos.outro50}" \
+    disabled=yes name=marcos.outro50 password=1xt11 profile=15_Megas_150 \
+    service=pppoe
+add caller-id=98:00:6A:45:38:B2 comment="{IXCSoft PPPOE -> marcos.aurelio54}" \
+    disabled=yes name=marcos.aurelio54 password=aiy3b profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:37:9C:24 comment="{IXCSoft PPPOE -> carlos.pessanha55}" \
+    disabled=yes name=carlos.pessanha55 password=52e5v profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=54:9F:06:12:9B:64 comment="{IXCSoft PPPOE -> marco.antonio56}" \
+    disabled=yes name=marco.antonio56 password=eyj38 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=04:18:D6:4A:2A:C5 comment="{IXCSoft PPPOE -> julio.cassaroti60}" \
+    disabled=yes name=julio.cassaroti60 password=1f6d1 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=E0:1F:ED:0E:33:E1 comment="{IXCSoft PPPOE -> angela.maria63}" \
+    disabled=yes name=angela.maria63 password=786ba profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=78:8A:20:98:FE:BB comment="{IXCSoft PPPOE -> joao.martini64}" \
+    disabled=yes name=joao.martini64 password=kg39q profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:D9:E7:24:28:14 comment="{IXCSoft PPPOE -> marcio.ribeiro66}" \
+    disabled=yes name=marcio.ribeiro66 password=8q17b profile=15_Megas_150 \
+    service=pppoe
+add caller-id=98:00:6A:5C:D5:30 comment="{IXCSoft PPPOE -> milton.francisco67}" \
+    disabled=yes name=milton.francisco67 password=kam5x profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=78:17:35:EB:6E:F1 comment="{IXCSoft PPPOE -> miguel.mendes73}" \
+    disabled=yes name=miguel.mendes73 password=e723v profile=\
+    Bofete_Fibra_150MB_PF service=pppoe
+add caller-id=44:D9:E7:AA:87:CA comment="{IXCSoft PPPOE -> iraneide.silva74}" \
+    disabled=yes name=iraneide.silva74 password=wby87 profile=15_Megas_150 \
+    service=pppoe
+add caller-id=8C:DC:02:5D:4F:7D comment="{IXCSoft PPPOE -> paulo.henrique75}" \
+    disabled=yes name=paulo.henrique75 password=wp4z6 profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=DC:9F:DB:EC:46:61 comment="{IXCSoft PPPOE -> angelo.antonio76}" \
+    disabled=yes name=angelo.antonio76 password=lkg13 profile=Alpes_10MB_90 \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> dirlei.murbach77}" disabled=yes name=\
+    dirlei.murbach77 password=0903jvj profile=pool_bloqueio service=pppoe
+add caller-id=94:E3:EE:21:B4:38 comment=\
+    "{IXCSoft PPPOE -> angelica.juventina78}" disabled=yes name=\
+    angelica.juventina78 password=51qlg profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add caller-id=00:27:22:02:95:B2 comment="{IXCSoft PPPOE -> alcina.rodrigues79}" \
+    disabled=yes name=alcina.rodrigues79 password=5n266 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=44:D9:E7:0C:60:87 comment="{IXCSoft PPPOE -> paulo.sergio80}" \
+    disabled=yes name=paulo.sergio80 password=x2ii9 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=F8:64:B8:A4:E6:DC comment="{IXCSoft PPPOE -> vinicius.alberto82}" \
+    disabled=yes name=vinicius.alberto82 password=k4925 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:D9:E7:4A:4C:AC comment="{IXCSoft PPPOE -> murilo.gallo83}" \
+    disabled=yes name=murilo.gallo83 password=wyu35 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:D9:E7:B4:30:C5 comment=\
+    "{IXCSoft PPPOE -> michelle.aparecida85}" disabled=yes name=\
+    michelle.aparecida85 password=1jn42 profile=Alpes_10MB_90 service=pppoe
+add caller-id=44:D9:E7:C0:8F:2E comment="{IXCSoft PPPOE -> claudio.cesar86}" \
+    disabled=yes name=claudio.cesar86 password=948a3 profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> praca.anhembi}" disabled=yes name=praca.anhembi \
+    password=l9lp8 profile=Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=88:B3:62:81:81:A7 comment=\
+    "{IXCSoft PPPOE -> estadio.municipal95}" disabled=yes name=\
+    estadio.municipal95 password=ucb6p profile=Bofete_Fibra_520MB_250 service=\
+    pppoe
+add caller-id=DC:D9:AE:F4:1F:91 comment="{IXCSoft PPPOE -> posto.saude00}" \
+    disabled=yes name=posto.saude00 password=72643 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=78:17:35:F0:4D:94 comment="{IXCSoft PPPOE -> escola.morada01}" \
+    disabled=yes name=escola.morada01 password=v44z6 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=E0:1F:ED:22:69:E9 comment=\
+    "{IXCSoft PPPOE -> almoxarifado.anhembi}" disabled=yes name=\
+    almoxarifado.anhembi password=2ys5d profile=Bofete_Fibra_520MB_250 service=\
+    pppoe
+add caller-id=98:00:6A:97:E6:D4 comment=\
+    "{IXCSoft PPPOE -> fundosocial.anhembi}" disabled=yes name=\
+    fundosocial.anhembi password=eca93 profile=Bofete_Fibra_520MB_250 service=\
+    pppoe
+add caller-id=E0:1F:ED:11:93:B1 comment="{IXCSoft PPPOE -> isadora.claudino}" \
+    disabled=yes name=isadora.claudino password=48p89 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=B8:19:04:CC:1F:C1 comment="{IXCSoft PPPOE -> casa.agricultura12}" \
+    disabled=yes name=casa.agricultura12 password=33267 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=DC:D9:AE:EF:1F:A4 comment="{IXCSoft PPPOE -> posto.saude1}" \
+    disabled=yes name=posto.saude1 password=suyg7 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=E0:1F:ED:14:1C:94 comment="{IXCSoft PPPOE -> cras.anhembi14}" \
+    disabled=yes name=cras.anhembi14 password=7612m profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=04:25:E0:91:8B:57 comment=\
+    "{IXCSoft PPPOE -> departamento.anhembi}" disabled=yes name=\
+    departamento.anhembi password=28s4f profile=Bofete_Fibra_520MB_250 service=\
+    pppoe
+add caller-id=AC:A4:6E:CD:63:97 comment="{IXCSoft PPPOE -> escola.mariocovas}" \
+    disabled=yes name=escola.mariocovas password=yf9rc profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=B8:19:04:CE:26:41 comment="{IXCSoft PPPOE -> taynara.souza18}" \
+    disabled=yes name=taynara.souza18 password=5q87b profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:9F:DB:26:50:7D comment="{IXCSoft PPPOE -> dejanir.silva19}" \
+    disabled=yes name=dejanir.silva19 password=6e7e5 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=FC:EC:DA:9E:5C:72 comment="{IXCSoft PPPOE -> lucelia.reginato21}" \
+    disabled=yes name=lucelia.reginato21 password=mqx76 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=D8:0D:17:E9:DB:8E comment=\
+    "{IXCSoft PPPOE -> aparecida.camargo23}" disabled=yes name=\
+    aparecida.camargo23 password=1huyu profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add caller-id=04:25:E0:AE:C1:14 comment="{IXCSoft PPPOE -> lilian.fernandes24}" \
+    disabled=yes name=lilian.fernandes24 password=jrysz profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:1F:ED:16:D9:E1 comment=\
+    "{IXCSoft PPPOE -> departamento.obras25}" disabled=yes name=\
+    departamento.obras25 password=9324m profile=Bofete_Fibra_520MB_250 service=\
+    pppoe
+add caller-id=54:9F:06:08:6D:F4 comment="{IXCSoft PPPOE -> parque.ecologico26}" \
+    disabled=yes name=parque.ecologico26 password=99f57 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=78:17:35:EE:C9:B1 comment="{IXCSoft PPPOE -> escola.picapau}" \
+    disabled=yes name=escola.picapau password=w2289 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=04:25:E0:E9:FC:27 comment="{IXCSoft PPPOE -> policia.anhembi}" \
+    disabled=yes name=policia.anhembi password=35kbl profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=DC:D9:AE:F5:2E:71 comment="{IXCSoft PPPOE -> posto.saude2}" \
+    disabled=yes name=posto.saude2 password=j1ua5 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=78:17:35:EC:AB:C4 comment="{IXCSoft PPPOE -> radio.comunitaria}" \
+    disabled=yes name=radio.comunitaria password=79t1q profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=04:25:E0:E9:FD:87 comment=\
+    "{IXCSoft PPPOE -> departamento.esportes32}" disabled=yes name=\
+    departamento.esportes32 password=w49xz profile=Prefeitura_Fibra_100MB \
+    service=pppoe
+add caller-id=F8:0C:58:0B:31:D7 comment=\
+    "{IXCSoft PPPOE -> posto.informacoes33}" disabled=yes name=\
+    posto.informacoes33 password=3m822 profile=Prefeitura_Fibra_100MB service=\
+    pppoe
+add caller-id=94:E3:EE:21:A9:6A comment="{IXCSoft PPPOE -> paco.anhembi}" \
+    disabled=yes name=paco.anhembi password=2n110 profile=300MB_fibra_109 \
+    remote-address=100.200.13.3 service=pppoe
+add caller-id=F8:64:B8:A3:3A:27 comment="{IXCSoft PPPOE -> denise.silva}" \
+    disabled=yes name=denise.silva password=zx2s3 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=DC:9F:DB:26:24:54 comment=\
+    "{IXCSoft PPPOE -> francisco.augusto42}" disabled=yes name=\
+    francisco.augusto42 password=b2v5i profile=10_MB_90 service=pppoe
+add caller-id=A4:F3:3B:92:11:E5 comment="{IXCSoft PPPOE -> artnet.anhembi}" \
+    disabled=yes name=artnet.anhembi password=uid23 profile=\
+    Bofete_Fibra_1000MB_PF remote-address=100.200.13.10 service=pppoe
+add caller-id=04:25:E0:E9:26:37 comment="{IXCSoft PPPOE -> maria.baptista}" \
+    disabled=yes name=maria.baptista password=jiq4y profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=04:25:E0:E6:B5:34 comment="{IXCSoft PPPOE -> centro.cultural77}" \
+    disabled=yes name=centro.cultural77 password=331kx profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=04:25:E0:38:2D:08 comment="{IXCSoft PPPOE -> rafael.freitosa82}" \
+    disabled=yes name=rafael.freitosa82 password=2955g profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add comment="{IXCSoft PPPOE -> anhembi.link}" disabled=yes name=anhembi.link \
+    password=6qk7g profile=Bofete_Fibra_1000MB_PF service=pppoe
+add caller-id=E8:9E:0C:00:C5:A1 comment="{IXCSoft PPPOE -> djenifer.souza}" \
+    disabled=yes name=djenifer.souza password=xsxcn profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=04:25:E0:93:48:07 comment=\
+    "{IXCSoft PPPOE -> kassyane.baptista52}" disabled=yes name=\
+    kassyane.baptista52 password=38b63 profile=pool_bloqueio service=pppoe
+add caller-id=B8:19:04:CC:DC:A1 comment="{IXCSoft PPPOE -> sara.alves13}" \
+    disabled=yes name=sara.alves13 password=c29ay profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=88:B3:62:0F:6E:3D comment="{IXCSoft PPPOE -> matheus.quadros58}" \
+    disabled=yes name=matheus.quadros58 password=k1487 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=F8:64:B8:A0:23:5E comment=\
+    "{IXCSoft PPPOE -> gessica.figueiredo22}" disabled=yes name=\
+    gessica.figueiredo22 password=pcvn7 profile=pool_bloqueio service=pppoe
+add caller-id=E0:1F:ED:14:52:01 comment="{IXCSoft PPPOE -> eloiza.ramalho}" \
+    disabled=yes name=eloiza.ramalho password=f363b profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add comment="{IXCSoft PPPOE -> edna.cristina}" disabled=yes name=edna.cristina \
+    password=83t4j profile=pool_bloqueio service=pppoe
+add caller-id=54:9F:06:08:5A:31 comment="{IXCSoft PPPOE -> altair.jose}" \
+    disabled=yes name=altair.jose password=7kt6j profile=Anhembi_Fibra_520MB_PF \
+    service=pppoe
+add caller-id=08:9A:C7:98:48:A4 comment=\
+    "{IXCSoft PPPOE -> salvador.oliveira45}" disabled=yes name=\
+    salvador.oliveira45 password=z66e5 profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add caller-id=E0:1F:ED:16:BD:A1 comment="{IXCSoft PPPOE -> emei.anhembi47}" \
+    disabled=yes name=emei.anhembi47 password=u94k9 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=E0:1F:ED:27:5E:B9 comment="{IXCSoft PPPOE -> damiao.silva99}" \
+    disabled=yes name=damiao.silva99 password=8z993 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:1F:ED:15:78:A1 comment="{IXCSoft PPPOE -> casa.anhembi65}" \
+    disabled=yes name=casa.anhembi65 password=q1316 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=E0:1F:ED:10:97:01 comment="{IXCSoft PPPOE -> luan.silva16}" \
+    disabled=yes name=luan.silva16 password=qpfe4 profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=78:17:35:F1:C7:01 comment="{IXCSoft PPPOE -> rivania.oliveira78}" \
+    disabled=yes name=rivania.oliveira78 password=qzjy9 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:17:35:17:1F:75 comment="{IXCSoft PPPOE -> delza.silva87}" \
+    disabled=yes name=delza.silva87 password=16k98 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=B8:19:04:C5:7A:61 comment="{IXCSoft PPPOE -> josefina.lima89}" \
+    disabled=yes name=josefina.lima89 password=pqz8f profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=E0:1F:ED:15:74:24 comment="{IXCSoft PPPOE -> centro.idoso46}" \
+    disabled=yes name=centro.idoso46 password=c9u44 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=30:42:40:C2:97:D8 comment="{IXCSoft PPPOE -> rogeria.silva63}" \
+    disabled=yes name=rogeria.silva63 password=ze791 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=C0:B1:01:E4:0C:D0 comment="{IXCSoft PPPOE -> luiza.nogueira64}" \
+    disabled=yes name=luiza.nogueira64 password=lyz92 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=E0:1F:ED:0E:FA:34 comment="{IXCSoft PPPOE -> promotor.anhembi67}" \
+    disabled=yes name=promotor.anhembi67 password=1e894 profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=DC:D9:AE:F7:3B:84 comment="{IXCSoft PPPOE -> fabricio.jacinto80}" \
+    disabled=yes name=fabricio.jacinto80 password=6py31 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=94:E3:EE:09:2A:2A comment="{IXCSoft PPPOE -> nivaldo.moura93}" \
+    disabled=yes name=nivaldo.moura93 password=cs8lj profile=pool_bloqueio \
+    service=pppoe
+add caller-id=94:E3:EE:2A:39:4A comment="{IXCSoft PPPOE -> bruna.alves27}" \
+    disabled=yes name=bruna.alves27 password=h81a2 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=38:6B:1C:A1:12:06 comment="{IXCSoft PPPOE -> ednilson.araujo28}" \
+    disabled=yes name=ednilson.araujo28 password=x7mvr profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=98:00:6A:78:BE:2A comment="{IXCSoft PPPOE -> aline.camargo38}" \
+    disabled=yes name=aline.camargo38 password=86wr6 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=C0:B1:01:E8:08:2E comment="{IXCSoft PPPOE -> jurandir.belato}" \
+    disabled=yes name=jurandir.belato password=8fv24 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=98:00:6A:77:29:90 comment="{IXCSoft PPPOE -> joaquim.costa46}" \
+    disabled=yes name=joaquim.costa46 password=6pyen profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=FC:40:09:18:41:0A comment="{IXCSoft PPPOE -> anderson.quevedo53}" \
+    disabled=yes name=anderson.quevedo53 password=81344 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=C0:B1:01:E8:C8:22 comment="{IXCSoft PPPOE -> dyeines.santos54}" \
+    disabled=yes name=dyeines.santos54 password=c7ktb profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:19:54:E2:1A:EC comment="{IXCSoft PPPOE -> conselho.anhembi}" \
+    disabled=yes name=conselho.anhembi password=4d78q profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=B8:19:04:CC:42:71 comment=\
+    "{IXCSoft PPPOE -> departamento.saude32}" disabled=yes name=\
+    departamento.saude32 password=7u44f profile=Bofete_Fibra_520MB_250 service=\
+    pppoe
+add caller-id=94:E3:EE:20:89:04 comment=\
+    "{IXCSoft PPPOE -> ismeridriane.karine}" disabled=yes name=\
+    ismeridriane.karine password=46bw7 profile=pool_bloqueio service=pppoe
+add caller-id=D8:0D:17:A3:6B:DF comment="{IXCSoft PPPOE -> carlos.augusto48}" \
+    disabled=yes name=carlos.augusto48 password=u9i52 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:25:E0:72:46:C7 comment="{IXCSoft PPPOE -> robson.camargo68}" \
+    disabled=yes name=robson.camargo68 password=ml88a profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:D9:AE:F6:11:94 comment="{IXCSoft PPPOE -> rafaela.barbosa89}" \
+    disabled=yes name=rafaela.barbosa89 password=47a12 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=E0:1F:ED:17:B9:61 comment="{IXCSoft PPPOE -> marcio.correa94}" \
+    disabled=yes name=marcio.correa94 password=s2r6a profile=pool_bloqueio \
+    service=pppoe
+add caller-id=A8:74:84:D3:CC:B8 comment="{IXCSoft PPPOE -> jose.roberto01}" \
+    disabled=yes name=jose.roberto01 password=v27kz profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:18:D6:2A:DE:33 comment="{IXCSoft PPPOE -> carlos.machuca75}" \
+    disabled=yes name=carlos.machuca75 password=4bk67 profile=Pardinho_30MB_PF \
+    service=pppoe
+add caller-id=94:E3:EE:27:E1:80 comment="{IXCSoft PPPOE -> maria.lucia27}" \
+    disabled=yes name=maria.lucia27 password=kn2cb profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=94:E3:EE:27:6D:52 comment="{IXCSoft PPPOE -> leandro.luciano23}" \
+    disabled=yes name=leandro.luciano23 password=r63tg profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=54:9F:06:37:40:B1 comment="{IXCSoft PPPOE -> paulo.oliveira46}" \
+    disabled=yes name=paulo.oliveira46 password=52eq7 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=E0:19:54:D8:AE:16 comment="{IXCSoft PPPOE -> henrique.matheus49}" \
+    disabled=yes name=henrique.matheus49 password=3m7c9 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=DC:D9:AE:EF:D5:01 comment="{IXCSoft PPPOE -> andre.eduardo64}" \
+    disabled=yes name=andre.eduardo64 password=7vw72 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=94:E3:EE:25:19:F6 comment=\
+    "{IXCSoft PPPOE -> leiluanda.cristina95}" disabled=yes name=\
+    leiluanda.cristina95 password=yi15f profile=pool_bloqueio service=pppoe
+add comment="{IXCSoft PPPOE -> mari.passarote}" disabled=yes name=\
+    mari.passarote password=4jn12 profile=Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=E0:19:54:D8:E2:6C comment="{IXCSoft PPPOE -> rosana.marcondes19}" \
+    disabled=yes name=rosana.marcondes19 password=8716i profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=74:DA:88:85:2F:98 comment="{IXCSoft PPPOE -> joao.filho20}" \
+    disabled=yes name=joao.filho20 password=sm159 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=78:17:35:AD:28:CA comment="{IXCSoft PPPOE -> caroline.souza21}" \
+    disabled=yes name=caroline.souza21 password=9z78y profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:0D:4D:A4 comment="{IXCSoft PPPOE -> rogeria.cristina34}" \
+    disabled=yes name=rogeria.cristina34 password=9998v profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:D9:AE:F1:E5:71 comment="{IXCSoft PPPOE -> vitoria.oliveira28}" \
+    disabled=yes name=vitoria.oliveira28 password=zd59n profile=pool_bloqueio \
+    service=pppoe
+add caller-id=68:FF:7B:57:D9:A8 comment="{IXCSoft PPPOE -> raimundo.nonato29}" \
+    disabled=yes name=raimundo.nonato29 password=5gd6n profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add comment="{IXCSoft PPPOE -> wagner.vicentini70}" disabled=yes name=\
+    wagner.vicentini70 password=74874 profile=Anhembi_Fibra_780MB_PF service=\
+    pppoe
+add caller-id=E0:1F:ED:12:A0:31 comment="{IXCSoft PPPOE -> natha.santos55}" \
+    disabled=yes name=natha.santos55 password=2p562 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=DC:D9:AE:F2:84:41 comment="{IXCSoft PPPOE -> edineia.arruda72}" \
+    disabled=yes name=edineia.arruda72 password=76699 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:1F:ED:12:8D:E1 comment=\
+    "{IXCSoft PPPOE -> reginaldo.barbosa86}" disabled=yes name=\
+    reginaldo.barbosa86 password=236tg profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=10:47:38:FA:A9:31 comment=\
+    "{IXCSoft PPPOE -> marcelo.cechinato13}" disabled=yes name=\
+    marcelo.cechinato13 password=6wqa5 profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=24:0B:88:4D:D7:24 comment=\
+    "{IXCSoft PPPOE -> analuiza.thomazella}" disabled=yes name=\
+    analuiza.thomazella password=213n2 profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add caller-id=AC:37:28:9F:1D:87 comment="{IXCSoft PPPOE -> robson.peixoto46}" \
+    disabled=yes name=robson.peixoto46 password=7k99z profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=94:E3:EE:0B:1F:00 comment="{IXCSoft PPPOE -> santina.carmo28}" \
+    disabled=yes name=santina.carmo28 password=z47iv profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=04:25:E0:37:26:F8 comment="{IXCSoft PPPOE -> bianca.almeida49}" \
+    disabled=yes name=bianca.almeida49 password=782dw profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=30:23:64:AB:AB:A4 comment="{IXCSoft PPPOE -> rosemeire.campos36}" \
+    disabled=yes name=rosemeire.campos36 password=g3q9w profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=94:E3:EE:27:D3:5E comment="{IXCSoft PPPOE -> luiz.carneiro68}" \
+    disabled=yes name=luiz.carneiro68 password=4982d profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:19:54:D4:BB:64 comment="{IXCSoft PPPOE -> helio.cassemiro70}" \
+    disabled=yes name=helio.cassemiro70 password=unmc7 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:9A:91:34 comment="{IXCSoft PPPOE -> mauricio.quadros74}" \
+    disabled=yes name=mauricio.quadros74 password=96977 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=D8:0D:17:A3:43:E3 comment="{IXCSoft PPPOE -> neuza.aparecida79}" \
+    disabled=yes name=neuza.aparecida79 password=978ff profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:D9:AE:F3:A5:11 comment="{IXCSoft PPPOE -> jaime.durban80}" \
+    disabled=yes name=jaime.durban80 password=4gd89 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=B8:19:04:C2:ED:31 comment="{IXCSoft PPPOE -> amaury.mendes81}" \
+    disabled=yes name=amaury.mendes81 password=n12ya profile=pool_bloqueio \
+    service=pppoe
+add caller-id=B8:19:04:C5:75:31 comment="{IXCSoft PPPOE -> cicero.silva05}" \
+    disabled=yes name=cicero.silva05 password=l299j profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=78:17:35:F0:2A:C1 comment="{IXCSoft PPPOE -> joao.siqueira29}" \
+    disabled=yes name=joao.siqueira29 password=1e861 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=E8:9E:0C:00:60:31 comment="{IXCSoft PPPOE -> kaline.chaves}" \
+    disabled=yes name=kaline.chaves password=7sg6j profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E8:9E:0C:00:AC:E1 comment=\
+    "{IXCSoft PPPOE -> aparecido.goncalves}" disabled=yes name=\
+    aparecido.goncalves password=58v56 profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add caller-id=78:17:35:F2:48:E1 comment="{IXCSoft PPPOE -> joao.ferracini}" \
+    disabled=yes name=joao.ferracini password=f8742 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:D9:AE:F6:FF:04 comment="{IXCSoft PPPOE -> leonardo.vale}" \
+    disabled=yes name=leonardo.vale password=737i8 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=FC:40:09:16:AF:70 comment="{IXCSoft PPPOE -> suely.aparecida56}" \
+    disabled=yes name=suely.aparecida56 password=ryxts profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=78:17:35:F0:67:11 comment="{IXCSoft PPPOE -> leandra.santos44}" \
+    disabled=yes name=leandra.santos44 password=edu5n profile=pool_bloqueio \
+    service=pppoe
+add caller-id=54:9F:06:06:A8:54 comment="{IXCSoft PPPOE -> leticia.morato}" \
+    disabled=yes name=leticia.morato password=24c5b profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:17:35:EF:44:15 comment=\
+    "{IXCSoft PPPOE -> valquiria.batista809}" disabled=yes name=\
+    valquiria.batista809 password=f57rw profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=E0:1F:ED:25:BD:CC comment="{IXCSoft PPPOE -> alexandre.ataide16}" \
+    disabled=yes name=alexandre.ataide16 password=98iu4 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=54:9F:06:36:91:11 comment="{IXCSoft PPPOE -> maria.eduarda19}" \
+    disabled=yes name=maria.eduarda19 password=27yx4 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=54:9F:06:3D:31:E1 comment="{IXCSoft PPPOE -> fabiano.mapa25}" \
+    disabled=yes name=fabiano.mapa25 password=5283c profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:25:E0:AE:41:36 comment="{IXCSoft PPPOE -> eliete.delmondes}" \
+    disabled=yes name=eliete.delmondes password=63wsx profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=F4:6F:ED:D3:F7:D3 comment="{IXCSoft PPPOE -> evandro.benedito85}" \
+    disabled=yes name=evandro.benedito85 password=riqc8 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=C8:E7:D8:71:9C:BB comment="{IXCSoft PPPOE -> matheus.link51}" \
+    disabled=yes name=matheus.link51 password=8w39d profile=\
+    Anhembi_Fibra_780MB_PF service=pppoe
+add caller-id=B8:19:04:C4:A0:D1 comment="{IXCSoft PPPOE -> marcos.leme99}" \
+    disabled=yes name=marcos.leme99 password=hp424 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:35:23:41 comment="{IXCSoft PPPOE -> jose.vandes46}" \
+    disabled=yes name=jose.vandes46 password=8vrun profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=98:00:6A:6C:60:79 comment="{IXCSoft PPPOE -> victor.rauen13}" \
+    disabled=yes name=victor.rauen13 password=915ue profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:D9:AE:F6:AE:41 comment=\
+    "{IXCSoft PPPOE -> beatriz.nascimento73}" disabled=yes name=\
+    beatriz.nascimento73 password=2w5lx profile=Bofete_Fibra_150MB_PF_79 \
+    service=pppoe
+add caller-id=6C:A4:D1:9E:B6:DB comment="{IXCSoft PPPOE -> edivan.lima}" \
+    disabled=yes name=edivan.lima password=bvu45 profile=Anhembi_Fibra_150MB_PF \
+    service=pppoe
+add caller-id=F4:6F:ED:87:B9:33 comment="{IXCSoft PPPOE -> elizamara.gomes}" \
+    disabled=yes name=elizamara.gomes password=r3uyg profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> teste.anhembi}" disabled=yes name=teste.anhembi \
+    password=teste profile=Bofete_Fibra_150MB_PF service=pppoe
+add caller-id=78:17:35:EB:3D:E1 comment="{IXCSoft PPPOE -> sandra.araujo47}" \
+    disabled=yes name=sandra.araujo47 password=v33e4 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=78:17:35:F0:32:41 comment="{IXCSoft PPPOE -> vania.figueiredo48}" \
+    disabled=yes name=vania.figueiredo48 password=v9297 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=DC:D9:AE:F3:F4:84 comment="{IXCSoft PPPOE -> alexandre.silva27}" \
+    disabled=yes name=alexandre.silva27 password=biyqk profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=B4:26:5D:AE:F3:C1 comment="{IXCSoft PPPOE -> jose.eduardo57}" \
+    disabled=yes name=jose.eduardo57 password=m7fh8 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=F4:6F:ED:45:67:6B comment="{IXCSoft PPPOE -> lavinia.alves77}" \
+    disabled=yes name=lavinia.alves77 password=16l76 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=B4:26:5D:B0:05:11 comment="{IXCSoft PPPOE -> voluy.anhembi}" \
+    disabled=yes name=voluy.anhembi password=wd863 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=78:17:35:EE:95:31 comment="{IXCSoft PPPOE -> franscisco.alves87}" \
+    disabled=yes name=franscisco.alves87 password=41e9y profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=B4:26:5D:B0:04:D4 comment="{IXCSoft PPPOE -> magda.souza89}" \
+    disabled=yes name=magda.souza89 password=as614 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=6C:A4:D1:9E:B7:43 comment="{IXCSoft PPPOE -> rosana.pereira96}" \
+    disabled=yes name=rosana.pereira96 password=hg4fq profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> iraneide.segundoponto}" disabled=yes name=\
+    iraneide.segundoponto password=h3626 profile=pool_bloqueio service=pppoe
+add caller-id=6C:A4:D1:A3:0C:E3 comment="{IXCSoft PPPOE -> maria.daniela98}" \
+    disabled=yes name=maria.daniela98 password=6m154 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:35:2C:91 comment="{IXCSoft PPPOE -> antonio.carlos19}" \
+    disabled=yes name=antonio.carlos19 password=4b282 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=94:E3:EE:0A:86:84 comment="{IXCSoft PPPOE -> cicero.silva33}" \
+    disabled=yes name=cicero.silva33 password=3gc2i profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:1F:ED:0F:02:E4 comment="{IXCSoft PPPOE -> daisy.braga39}" \
+    disabled=yes name=daisy.braga39 password=ku488 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=FC:40:09:17:46:78 comment="{IXCSoft PPPOE -> diana.soares42}" \
+    disabled=yes name=diana.soares42 password=949l5 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=FC:40:09:17:E1:A0 comment="{IXCSoft PPPOE -> marcia.alves52}" \
+    disabled=yes name=marcia.alves52 password=6tr59 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=FC:EC:DA:9E:32:B1 comment="{IXCSoft PPPOE -> anderson.incerp49}" \
+    disabled=yes name=anderson.incerp49 password=7hc84 profile=15_Megas_150 \
+    service=pppoe
+add caller-id=04:25:E0:E8:D1:F7 comment="{IXCSoft PPPOE -> walter.pires}" \
+    disabled=yes name=walter.pires password=7kz68 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=10:47:38:D1:25:94 comment="{IXCSoft PPPOE -> tatila.dourado}" \
+    disabled=yes name=tatila.dourado password=nnm2u profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:11:11:44 comment=\
+    "{IXCSoft PPPOE -> juliana.marcondes61}" disabled=yes name=\
+    juliana.marcondes61 password=631an profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add comment="{IXCSoft PPPOE -> antonio.barros19}" disabled=yes name=\
+    antonio.barros19 password=8617f profile=pool_bloqueio service=pppoe
+add caller-id=AC:71:2E:F4:04:4F comment="{IXCSoft PPPOE -> sicoob.anhembi70}" \
+    disabled=yes name=sicoob.anhembi70 password=6cdr1 profile=\
+    PLANO_150_MEGAS_URBANO remote-address=186.219.234.13 service=pppoe
+add caller-id=D8:47:32:2C:1D:77 comment="{IXCSoft PPPOE -> eduardo.vieira73}" \
+    disabled=yes name=eduardo.vieira73 password=dyhr6 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=10:47:38:FD:3A:74 comment="{IXCSoft PPPOE -> alex.bezerra77}" \
+    disabled=yes name=alex.bezerra77 password=8v553 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=08:9A:C7:95:A0:5E comment=\
+    "{IXCSoft PPPOE -> cleia.linkanhembi78}" disabled=yes name=\
+    cleia.linkanhembi78 password=m8w9p profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=10:47:38:9E:BC:34 comment="{IXCSoft PPPOE -> nivaldo.silva18}" \
+    disabled=yes name=nivaldo.silva18 password=71fxa profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:0F:A9:CE comment="{IXCSoft PPPOE -> maria.tereza14}" \
+    disabled=yes name=maria.tereza14 password=tr56f profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=00:27:22:B6:54:E1 comment="{IXCSoft PPPOE -> ariane.silva21}" \
+    disabled=yes name=ariane.silva21 password=5cgu6 profile=Alpes_10MB_90 \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> jaqueline.nunes26}" disabled=yes name=\
+    jaqueline.nunes26 password=g89sq profile=pool_bloqueio service=pppoe
+add caller-id=88:B3:62:0F:96:DE comment="{IXCSoft PPPOE -> patricia.souza42}" \
+    disabled=yes name=patricia.souza42 password=hckw1 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:0F:6F:22 comment="{IXCSoft PPPOE -> carlos.leme37}" \
+    disabled=yes name=carlos.leme37 password=89h37 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:0F:A8:8D comment="{IXCSoft PPPOE -> danubia.regina49}" \
+    disabled=yes name=danubia.regina49 password=z9tya profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:0F:26:25 comment="{IXCSoft PPPOE -> camila.mariano806}" \
+    disabled=yes name=camila.mariano806 password=fw41c profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=88:B3:62:0F:94:C9 comment="{IXCSoft PPPOE -> fernando.ramos66}" \
+    disabled=yes name=fernando.ramos66 password=329y8 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=88:B3:62:0F:B3:29 comment="{IXCSoft PPPOE -> nsalambi.pedro69}" \
+    disabled=yes name=nsalambi.pedro69 password=8t9kn profile=pool_bloqueio \
+    service=pppoe
+add caller-id=FC:EC:DA:20:7B:7C comment="{IXCSoft PPPOE -> david.almeida81}" \
+    disabled=yes name=david.almeida81 password=j13f7 profile=15_Megas_150 \
+    service=pppoe
+add caller-id=88:B3:62:0F:23:76 comment="{IXCSoft PPPOE -> josiano.alves85}" \
+    disabled=yes name=josiano.alves85 password=df238 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=88:B3:62:0F:3D:37 comment="{IXCSoft PPPOE -> adilson.silva88}" \
+    disabled=yes name=adilson.silva88 password=292u7 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:0F:DB:44 comment=\
+    "{IXCSoft PPPOE -> florisvaldo.vieira92}" disabled=yes name=\
+    florisvaldo.vieira92 password=j2295 profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=88:B3:62:0F:72:1D comment="{IXCSoft PPPOE -> dayane.andre97}" \
+    disabled=yes name=dayane.andre97 password=sk4m5 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:0F:43:82 comment="{IXCSoft PPPOE -> maria.eduarda23}" \
+    disabled=yes name=maria.eduarda23 password=57dvc profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=88:B3:62:0F:DC:F2 comment="{IXCSoft PPPOE -> eraldo.prado33}" \
+    disabled=yes name=eraldo.prado33 password=y716r profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:17:35:EF:80:E4 comment="{IXCSoft PPPOE -> anni.amaral13}" \
+    disabled=yes name=anni.amaral13 password=7183h profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=88:B3:62:0F:35:B5 comment=\
+    "{IXCSoft PPPOE -> cristiano.padilha75}" disabled=yes name=\
+    cristiano.padilha75 password=7374i profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=88:B3:62:0F:8A:3C comment="{IXCSoft PPPOE -> weliton.inacio22}" \
+    disabled=yes name=weliton.inacio22 password=5yrr2 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:25:E0:E6:FA:C7 comment="{IXCSoft PPPOE -> loukole.puroika48}" \
+    disabled=yes name=loukole.puroika48 password=57931 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=DC:9F:DB:86:A9:9A comment="{IXCSoft PPPOE -> antonio.arioso64}" \
+    disabled=yes name=antonio.arioso64 password=59u6a profile=Alpes_20MB_120 \
+    service=pppoe
+add caller-id=88:B3:62:0F:A0:0E comment="{IXCSoft PPPOE -> maria.araujo6066}" \
+    disabled=yes name=maria.araujo6066 password=pdc52 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=00:27:22:76:81:B4 comment=\
+    "{IXCSoft PPPOE -> thiago.oliveira6508}" disabled=yes name=\
+    thiago.oliveira6508 password=76eg8 profile=Alpes_20MB_120 service=pppoe
+add caller-id=88:B3:62:0F:27:56 comment="{IXCSoft PPPOE -> carlos.gabriel67}" \
+    disabled=yes name=carlos.gabriel67 password=3nj7w profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=88:B3:62:0F:BB:DD comment="{IXCSoft PPPOE -> jose.rosa6514}" \
+    disabled=yes name=jose.rosa6514 password=365x5 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=54:9F:06:9D:24:61 comment="{IXCSoft PPPOE -> matheus.silva6083}" \
+    disabled=yes name=matheus.silva6083 password=en178 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:D9:E7:7E:2C:09 comment="{IXCSoft PPPOE -> rogeria.souza6088}" \
+    disabled=yes name=rogeria.souza6088 password=g817y profile=Alpes_20MB_120 \
+    service=pppoe
+add caller-id=88:B3:62:0F:6E:73 comment="{IXCSoft PPPOE -> pontocortesia.2}" \
+    disabled=yes name=pontocortesia.2 password=5qy5j profile=\
+    Bofete_Fibra_520MB_250 service=pppoe
+add caller-id=F0:9F:C2:54:57:C0 comment="{IXCSoft PPPOE -> eugenia.silva00}" \
+    disabled=yes name=eugenia.silva00 password=68jx6 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=94:E3:EE:01:57:8C comment="{IXCSoft PPPOE -> jessica.santos6117}" \
+    disabled=yes name=jessica.santos6117 password=x714k profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=E0:1F:ED:2B:A5:7C comment="{IXCSoft PPPOE -> rosana.bueno6122}" \
+    disabled=yes name=rosana.bueno6122 password=49czq profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=AC:84:C6:34:65:FF comment="{IXCSoft PPPOE -> elaine.souza6123}" \
+    disabled=yes name=elaine.souza6123 password=k4421 profile=Alpes_20MB_120 \
+    service=pppoe
+add caller-id=80:2A:A8:B4:E6:66 comment="{IXCSoft PPPOE -> paula.maria6130}" \
+    disabled=yes name=paula.maria6130 password=ew9l4 profile=Alpes_10MB_90 \
+    service=pppoe
+add caller-id=44:D9:E7:B0:17:0A comment="{IXCSoft PPPOE -> alisson.dutra6133}" \
+    disabled=yes name=alisson.dutra6133 password=135r4 profile=Alpes_20MB_120 \
+    service=pppoe
+add caller-id=94:E3:EE:26:78:1E comment="{IXCSoft PPPOE -> lucilene.franco54}" \
+    disabled=yes name=lucilene.franco54 password=64a6i profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=E8:9E:0C:00:A0:79 comment=\
+    "{IXCSoft PPPOE -> alexandre.vilella65}" disabled=yes name=\
+    alexandre.vilella65 password=5632j profile=Anhembi_Fibra_150MB_PF service=\
+    pppoe
+add caller-id=E8:9E:0C:00:85:51 comment=\
+    "{IXCSoft PPPOE -> paschoal.siqueira73}" disabled=yes name=\
+    paschoal.siqueira73 password=bk55z profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=44:D9:E7:5C:F6:EE comment="{IXCSoft PPPOE -> andressa.maria77}" \
+    disabled=yes name=andressa.maria77 password=d1x4u profile=Alpes_20MB_120 \
+    service=pppoe
+add caller-id=88:B3:62:0F:6E:73 comment="{IXCSoft PPPOE -> sherley.torrisi80}" \
+    disabled=yes name=sherley.torrisi80 password=7te44 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=54:9F:06:35:2C:91 comment=\
+    "{IXCSoft PPPOE -> osmano.oliveira6179}" disabled=yes name=\
+    osmano.oliveira6179 password=8945c profile=Anhembi_Fibra_520MB_PF service=\
+    pppoe
+add caller-id=FC:40:09:81:B5:84 comment="{IXCSoft PPPOE -> joao.rodrigues89}" \
+    disabled=yes name=joao.rodrigues89 password=4i9fl profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=E0:1F:ED:14:20:F1 comment="{IXCSoft PPPOE -> silvio.taranta10}" \
+    disabled=yes name=silvio.taranta10 password=bpy41 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+add caller-id=F4:6F:ED:B3:4A:FB comment="{IXCSoft PPPOE -> robson.silva97}" \
+    disabled=yes name=robson.silva97 password=7q458 profile=\
+    Anhembi_Fibra_150MB_PF service=pppoe
+add caller-id=74:DA:88:2F:66:74 comment="{IXCSoft PPPOE -> silvia.lima02}" \
+    disabled=yes name=silvia.lima02 password=pb256 profile=\
+    Anhembi_Fibra_520MB_PF service=pppoe
+/radius
+add address=167.172.106.53 comment="RADIUS EMERGENCIA-ATIVAR QUANDO IXC CAIR" \
+    disabled=yes secret=testing123 service=ppp,hotspot
+add address=45.171.231.140 disabled=yes secret=tulipa service=ppp
+add address=207.248.10.142 comment="IXCProvedor configuracao radius" secret=\
+    radiusixcsoft service=ppp,hotspot,wireless src-address=10.69.0.14 timeout=\
+    3s
+/radius incoming
+set accept=yes
+/routing filter
+add action=accept chain=ospf-in prefix=0.0.0.0/0 set-pref-src=186.219.234.20
+add action=discard chain=ospf-out prefix=192.168.1.0/24
+/routing ospf area range
+add area=area1 range=100.64.13.0/24
+/routing ospf interface
+add interface=Loopback network-type=point-to-point passive=yes
+add interface=sfp-sfpplus1 network-type=point-to-point
+add passive=yes
+/routing ospf network
+add area=backbone network=10.255.255.9/32
+add area=backbone network=10.69.0.8/29
+add area=backbone network=10.69.0.20/30
+add area=backbone network=172.30.1.0/30
+add area=area1 network=100.64.13.0/24
+/routing ospf-v3 interface
+add area=backbone interface=sfp-sfpplus1 network-type=point-to-point
+/snmp
+set enabled=yes trap-community=artnet trap-generators=interfaces \
+    trap-interfaces=all trap-version=2
+/system clock
+set time-zone-name=America/Sao_Paulo
+/system identity
+set name=009-CE-ANHEMBI
+/system ntp client
+set enabled=yes primary-ntp=200.160.0.8
+/system scheduler
+add interval=1d name=bkp_ftp_procyon on-event=bkpprocyon policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon \
+    start-date=nov/17/2023 start-time=04:00:00
+add interval=1d name=IXCProvedor_agendamento-backup on-event=\
+    IXCProvedor-fazer-e-enviar-backup policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive start-date=\
+    dec/11/2023 start-time=04:00:00
+/system script
+add dont-require-permissions=no name=bkpprocyon owner=gabriel policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source=":lo\
+    cal ftpPath \"/Mikrotiks/ARTNET\" \r\
+    \n:local backupFileName (\"backup-\" . [:pick [/system clock get date] 7 11]\
+    \_. [:pick [/system clock get date] 0 3] . [:pick [/system clock get date] 4\
+    \_6] . \"-\" . [/system identity get name] . \".rsc\")\r\
+    \n\r\
+    \n# Cria o backup\r\
+    \n/export file=\$backupFileName\r\
+    \n\r\
+    \ntool fetch address=191.252.193.112 mode=ftp user=bkpprocyon password=procy\
+    on1q2w src-path=\$\"backupFileName\" dst-path=(\$ftpPath . \"/\" . \$backupF\
+    ileName) upload=yes\r\
+    \ndelay 10s\r\
+    \n/file remove \$backupFileName"
+add dont-require-permissions=no name=IXCProvedor-fazer-e-enviar-backup owner=\
+    ixc policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive \
+    source="export file=backup-mikrotik_ARTNET_CONCENTRADOR_ANHEMBI.rsc; :log in\
+    fo message=\"IXCSoft enviando backup por email\"; /tool e-mail send to=\"des\
+    tino@email.com\" subject=\"backup-ARTNET_CONCENTRADOR_ANHEMBI\" file=backup-\
+    mikrotik_ARTNET_CONCENTRADOR_ANHEMBI.rsc start-tls=yes"
+/tool e-mail
+set address=mail.artnettelecom.com.br from=suporte@artnettelecom.com.br \
+    password=@#Bol192 port=465 user=suporte@artnettelecom.com.br
+/tool graphing interface
+add
+/tool netwatch
+add down-script="ip firewall nat enable 0\r\
+    \n" host=10.69.0.9 up-script="ip firewall nat disable 0\r\
+    \n"
+add comment="{IXCSoft Netwatch}" down-script="/ppp secret ; :foreach i in [ find\
+    \_comment~\"IXCSoft PPPOE\" ] do={ enable  \$i };" host=207.248.10.142 \
+    interval=5m up-script="/ppp secret ; :foreach i in [ find comment~\"IXCSoft \
+    PPPOE\" ] do={ disable \$i }; /ppp active; :foreach p in [find comment~\"IXC\
+    Soft\"] do={ remove \$p; :delay 1};"
+/tool romon
+set enabled=yes
+[hemily@009-CE-ANHEMBI] > 
