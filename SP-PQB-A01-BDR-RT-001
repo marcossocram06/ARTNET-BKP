@@ -1,0 +1,961 @@
+
+
+
+
+
+
+
+
+
+
+  MMM      MMM       KKK                          TTTTTTTTTTT      KKK
+  MMMM    MMMM       KKK                          TTTTTTTTTTT      KKK
+  MMM MMMM MMM  III  KKK  KKK  RRRRRR     OOOOOO      TTT     III  KKK  KKK
+  MMM  MM  MMM  III  KKKKK     RRR  RRR  OOO  OOO     TTT     III  KKKKK
+  MMM      MMM  III  KKK KKK   RRRRRR    OOO  OOO     TTT     III  KKK KKK
+  MMM      MMM  III  KKK  KKK  RRR  RRR   OOOOOO      TTT     III  KKK  KKK
+
+  MikroTik RouterOS 6.49.10 (c) 1999-2023       http://www.mikrotik.com/
+
+[?]             Gives the list of available commands
+command [?]     Gives help on the command and list of arguments
+
+[Tab]           Completes the command/word. If the input is ambiguous,
+                a second [Tab] gives possible options
+
+/               Move up to base level
+..              Move up one level
+/command        Use command at the base level
+[hemily@SP-PQB-A01-BDR-RT-001] > export 
+# mar/02/2024 11:36:07 by RouterOS 6.49.10
+# software id = SKXW-8R23
+#
+# model = CCR1009-7G-1C-1S+
+# serial number = 7AEC071B5F13
+/interface bridge
+add name=Loopback0 protocol-mode=none
+add name=Loopback1
+/interface ethernet
+set [ find default-name=ether3 ] disabled=yes
+set [ find default-name=sfp-sfpplus1 ] advertise=10000M-full auto-negotiation=\
+    no
+/interface vlan
+add interface=sfp-sfpplus1 name=vlan531-EBGP-TVC vlan-id=531
+add interface=sfp-sfpplus1 name=vlan997-ospf-1009 vlan-id=997
+add interface=sfp-sfpplus1 name=vlan998-ospf-bng vlan-id=998
+add interface=sfp-sfpplus1 name=vlan999-gerencia-sw vlan-id=999
+add interface=sfp-sfpplus1 name=vlan1601-EBGP-ROS vlan-id=1601
+add interface=sfp-sfpplus1 name=vlan3001-dns vlan-id=3001
+add interface=sfp-sfpplus1 name=vlan3003-speedtest vlan-id=3003
+/ip pool
+add comment=Pool-VPN name=Pool-VPN ranges=10.190.180.10-10.190.180.100
+/ipv6 pool
+add name=Pool-PD prefix=2804:bb0:fc00::/44 prefix-length=56
+/ppp profile
+add change-tcp-mss=yes local-address=10.190.180.1 name=VPN-Profile only-one=no \
+    remote-address=Pool-VPN use-compression=yes use-encryption=yes use-mpls=no \
+    use-upnp=no
+/routing bgp instance
+set default as=52808 router-id=177.53.166.0
+/routing ospf instance
+set [ find default=yes ] distribute-default=always-as-type-1 \
+    redistribute-connected=as-type-1 redistribute-static=as-type-1 router-id=\
+    10.255.1.1
+/routing ospf-v3 instance
+set [ find default=yes ] distribute-default=always-as-type-1 \
+    redistribute-connected=as-type-1 redistribute-static=as-type-1 router-id=\
+    10.255.1.1
+/snmp community
+set [ find default=yes ] addresses=177.53.166.3/32,10.65.0.30/32 name=social-ro
+/interface ovpn-server server
+set auth=sha1 certificate=server cipher=aes256 enabled=yes port=51194 \
+    require-client-certificate=yes
+/ip address
+add address=177.53.166.0 interface=Loopback0 network=177.53.166.0
+add address=10.48.16.34/30 interface=vlan1601-EBGP-ROS network=10.48.16.32
+add address=177.53.166.9/29 interface=vlan3001-dns network=177.53.166.8
+add address=10.255.1.1 interface=Loopback1 network=10.255.1.1
+add address=10.65.0.1/30 interface=vlan999-gerencia-sw network=10.65.0.0
+add address=10.65.0.5/30 interface=vlan998-ospf-bng network=10.65.0.4
+add address=177.53.166.5/30 interface=vlan3001-dns network=177.53.166.4
+add address=10.65.0.25/30 interface=vlan997-ospf-1009 network=10.65.0.24
+add address=10.10.10.2/30 interface=vlan531-EBGP-TVC network=10.10.10.0
+add address=10.78.255.1 interface=vlan3003-speedtest network=177.53.166.1
+/ip dns
+set servers=177.53.66.13
+/ip firewall address-list
+add address=179.127.248.0/21 comment=Paulo list=Permitidos
+add address=168.228.184.0/22 comment=Hemily list=Permitidos
+add address=177.67.207.164 comment=Bruno list=Permitidos
+add address=177.70.247.0/24 comment=Gabriel_Praianet list=Permitidos
+add address=192.140.64.0/22 comment=Jason list=Permitidos
+add address=170.238.52.0/22 comment=Vitor list=Permitidos
+add address=187.111.141.0/24 comment=Lucas list=Permitidos
+add address=186.208.216.0/21 comment=Vitor_Celso list=Permitidos
+add address=10.0.0.0/8 comment=REDE-INTERNA list=Permitidos
+add address=100.64.0.0/10 comment=REDE-INTERNA list=Permitidos
+add address=192.168.0.0/16 comment=REDE-INTERNA list=Permitidos
+add address=172.16.0.0/12 comment=REDE-INTERNA list=Permitidos
+add address=10.255.0.0/16 comment=REDE-INTERNA list=Permitidos
+add address=177.53.166.0/24 comment="Bloco Cliente" list=Permitidos
+add address=10.255.0.0/16 list=NAT
+add address=10.65.0.28/30 list=NAT
+/ip firewall filter
+add action=accept chain=input comment=\
+    "Aceita conexoes estabelecidas e relacionadas" connection-state=\
+    established,related
+add action=drop chain=input comment="Descarta conexoes invalidas" \
+    connection-state=invalid disabled=yes
+add action=accept chain=input comment="Aceita SNMP" dst-port=161 protocol=udp
+add action=accept chain=input comment=Aceita-WINBOX dst-port=8260 protocol=tcp
+add action=accept chain=input comment=Aceita-OSPF protocol=ospf
+add action=accept chain=input comment=ACEITA-IPSEC protocol=ipsec-esp
+add action=accept chain=input comment=ACEITA-IPSEC protocol=ipsec-ah
+add action=accept chain=input comment=Aceita-BGP dst-port=179 protocol=tcp
+add action=accept chain=input comment=Aceita-Servicos dst-port=8222,8223,8282 \
+    protocol=tcp
+add action=accept chain=input comment=Libera-L2TP dst-port=1701 protocol=tcp
+add action=accept chain=input comment=Aceita-PPTP dst-port=1723 protocol=tcp
+add action=accept chain=input comment=Libera-L2TP dst-port=500,4500 protocol=\
+    udp
+add action=add-src-to-address-list address-list=Estagio1 address-list-timeout=\
+    5s chain=input comment="Port Knocking Stage2 TCP 2987" dst-port=2987 \
+    protocol=tcp
+add action=add-src-to-address-list address-list=Estagio2 address-list-timeout=\
+    10s chain=input comment="Port Knocking Stage3 TCP 5460" dst-port=5460 \
+    protocol=tcp src-address-list=Estagio1
+add action=add-src-to-address-list address-list=Permitidos \
+    address-list-timeout=2h chain=input comment="Port Knocking Stage3 TCP 5000" \
+    dst-port=5000 protocol=tcp src-address-list=Estagio2
+add action=drop chain=input disabled=yes src-address-list=!Permitidos
+/ip firewall nat
+add action=src-nat chain=srcnat src-address-list=NAT to-addresses=177.53.166.0
+add action=src-nat chain=srcnat comment=NAT-OVPN src-address=10.190.180.0/24 \
+    to-addresses=177.53.166.0
+add action=src-nat chain=srcnat disabled=yes src-address=100.64.120.0/21 \
+    to-addresses=177.53.166.128/25
+add action=jump chain=srcnat comment=PRIMEIRA-REGRA-NOVA jump-target=\
+    CGNAT_100_64_112 src-address=100.64.112.0/24
+add action=jump chain=srcnat jump-target=CGNAT_100_64_113 src-address=\
+    100.64.113.0/24
+add action=jump chain=srcnat jump-target=CGNAT_100_64_114 src-address=\
+    100.64.114.0/24
+add action=jump chain=srcnat jump-target=CGNAT_100_64_115 src-address=\
+    100.64.115.0/24
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_0 src-address=\
+    100.64.112.0/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_1 src-address=\
+    100.64.112.32/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_2 src-address=\
+    100.64.112.64/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_3 src-address=\
+    100.64.112.96/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_4 src-address=\
+    100.64.112.128/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_5 src-address=\
+    100.64.112.160/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_6 src-address=\
+    100.64.112.192/27
+add action=jump chain=CGNAT_100_64_112 jump-target=CGNAT_7 src-address=\
+    100.64.112.224/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_8 src-address=\
+    100.64.113.0/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_9 src-address=\
+    100.64.113.32/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_10 src-address=\
+    100.64.113.64/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_11 src-address=\
+    100.64.113.96/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_12 src-address=\
+    100.64.113.128/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_13 src-address=\
+    100.64.113.160/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_14 src-address=\
+    100.64.113.192/27
+add action=jump chain=CGNAT_100_64_113 jump-target=CGNAT_15 src-address=\
+    100.64.113.224/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_16 src-address=\
+    100.64.114.0/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_17 src-address=\
+    100.64.114.32/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_18 src-address=\
+    100.64.114.64/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_19 src-address=\
+    100.64.114.96/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_20 src-address=\
+    100.64.114.128/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_21 src-address=\
+    100.64.114.160/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_22 src-address=\
+    100.64.114.192/27
+add action=jump chain=CGNAT_100_64_114 jump-target=CGNAT_23 src-address=\
+    100.64.114.224/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_24 src-address=\
+    100.64.115.0/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_25 src-address=\
+    100.64.115.32/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_26 src-address=\
+    100.64.115.64/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_27 src-address=\
+    100.64.115.96/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_28 src-address=\
+    100.64.115.128/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_29 src-address=\
+    100.64.115.160/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_30 src-address=\
+    100.64.115.192/27
+add action=jump chain=CGNAT_100_64_115 jump-target=CGNAT_31 src-address=\
+    100.64.115.224/27
+add action=netmap chain=CGNAT_0 protocol=tcp src-address=100.64.112.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=1024-3039
+add action=netmap chain=CGNAT_0 protocol=udp src-address=100.64.112.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=1024-3039
+add action=netmap chain=CGNAT_0 src-address=100.64.112.0/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_1 protocol=tcp src-address=100.64.112.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=3040-5055
+add action=netmap chain=CGNAT_1 protocol=udp src-address=100.64.112.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=3040-5055
+add action=netmap chain=CGNAT_1 src-address=100.64.112.32/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_2 protocol=tcp src-address=100.64.112.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=5056-7071
+add action=netmap chain=CGNAT_2 protocol=udp src-address=100.64.112.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=5056-7071
+add action=netmap chain=CGNAT_2 src-address=100.64.112.64/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_3 protocol=tcp src-address=100.64.112.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=7072-9087
+add action=netmap chain=CGNAT_3 protocol=udp src-address=100.64.112.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=7072-9087
+add action=netmap chain=CGNAT_3 src-address=100.64.112.96/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_4 protocol=tcp src-address=100.64.112.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=9088-11103
+add action=netmap chain=CGNAT_4 protocol=udp src-address=100.64.112.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=9088-11103
+add action=netmap chain=CGNAT_4 src-address=100.64.112.128/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_5 protocol=tcp src-address=100.64.112.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=11104-13119
+add action=netmap chain=CGNAT_5 protocol=udp src-address=100.64.112.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=11104-13119
+add action=netmap chain=CGNAT_5 src-address=100.64.112.160/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_6 protocol=tcp src-address=100.64.112.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=13120-15135
+add action=netmap chain=CGNAT_6 protocol=udp src-address=100.64.112.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=13120-15135
+add action=netmap chain=CGNAT_6 src-address=100.64.112.192/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_7 protocol=tcp src-address=100.64.112.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=15136-17151
+add action=netmap chain=CGNAT_7 protocol=udp src-address=100.64.112.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=15136-17151
+add action=netmap chain=CGNAT_7 src-address=100.64.112.224/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_8 protocol=tcp src-address=100.64.113.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=17152-19167
+add action=netmap chain=CGNAT_8 protocol=udp src-address=100.64.113.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=17152-19167
+add action=netmap chain=CGNAT_8 src-address=100.64.113.0/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_9 protocol=tcp src-address=100.64.113.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=19168-21183
+add action=netmap chain=CGNAT_9 protocol=udp src-address=100.64.113.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=19168-21183
+add action=netmap chain=CGNAT_9 src-address=100.64.113.32/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_10 protocol=tcp src-address=100.64.113.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=21184-23199
+add action=netmap chain=CGNAT_10 protocol=udp src-address=100.64.113.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=21184-23199
+add action=netmap chain=CGNAT_10 src-address=100.64.113.64/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_11 protocol=tcp src-address=100.64.113.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=23200-25215
+add action=netmap chain=CGNAT_11 protocol=udp src-address=100.64.113.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=23200-25215
+add action=netmap chain=CGNAT_11 src-address=100.64.113.96/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_12 protocol=tcp src-address=100.64.113.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=25216-27231
+add action=netmap chain=CGNAT_12 protocol=udp src-address=100.64.113.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=25216-27231
+add action=netmap chain=CGNAT_12 src-address=100.64.113.128/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_13 protocol=tcp src-address=100.64.113.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=27232-29247
+add action=netmap chain=CGNAT_13 protocol=udp src-address=100.64.113.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=27232-29247
+add action=netmap chain=CGNAT_13 src-address=100.64.113.160/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_14 protocol=tcp src-address=100.64.113.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=29248-31263
+add action=netmap chain=CGNAT_14 protocol=udp src-address=100.64.113.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=29248-31263
+add action=netmap chain=CGNAT_14 src-address=100.64.113.192/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_15 protocol=tcp src-address=100.64.113.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=31264-33279
+add action=netmap chain=CGNAT_15 protocol=udp src-address=100.64.113.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=31264-33279
+add action=netmap chain=CGNAT_15 src-address=100.64.113.224/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_16 protocol=tcp src-address=100.64.114.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=33280-35295
+add action=netmap chain=CGNAT_16 protocol=udp src-address=100.64.114.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=33280-35295
+add action=netmap chain=CGNAT_16 src-address=100.64.114.0/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_17 protocol=tcp src-address=100.64.114.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=35296-37311
+add action=netmap chain=CGNAT_17 protocol=udp src-address=100.64.114.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=35296-37311
+add action=netmap chain=CGNAT_17 src-address=100.64.114.32/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_18 protocol=tcp src-address=100.64.114.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=37312-39327
+add action=netmap chain=CGNAT_18 protocol=udp src-address=100.64.114.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=37312-39327
+add action=netmap chain=CGNAT_18 src-address=100.64.114.64/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_19 protocol=tcp src-address=100.64.114.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=39328-41343
+add action=netmap chain=CGNAT_19 protocol=udp src-address=100.64.114.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=39328-41343
+add action=netmap chain=CGNAT_19 src-address=100.64.114.96/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_20 protocol=tcp src-address=100.64.114.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=41344-43359
+add action=netmap chain=CGNAT_20 protocol=udp src-address=100.64.114.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=41344-43359
+add action=netmap chain=CGNAT_20 src-address=100.64.114.128/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_21 protocol=tcp src-address=100.64.114.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=43360-45375
+add action=netmap chain=CGNAT_21 protocol=udp src-address=100.64.114.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=43360-45375
+add action=netmap chain=CGNAT_21 src-address=100.64.114.160/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_22 protocol=tcp src-address=100.64.114.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=45376-47391
+add action=netmap chain=CGNAT_22 protocol=udp src-address=100.64.114.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=45376-47391
+add action=netmap chain=CGNAT_22 src-address=100.64.114.192/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_23 protocol=tcp src-address=100.64.114.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=47392-49407
+add action=netmap chain=CGNAT_23 protocol=udp src-address=100.64.114.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=47392-49407
+add action=netmap chain=CGNAT_23 src-address=100.64.114.224/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_24 protocol=tcp src-address=100.64.115.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=49408-51423
+add action=netmap chain=CGNAT_24 protocol=udp src-address=100.64.115.0/27 \
+    to-addresses=177.53.166.32/27 to-ports=49408-51423
+add action=netmap chain=CGNAT_24 src-address=100.64.115.0/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_25 protocol=tcp src-address=100.64.115.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=51424-53439
+add action=netmap chain=CGNAT_25 protocol=udp src-address=100.64.115.32/27 \
+    to-addresses=177.53.166.32/27 to-ports=51424-53439
+add action=netmap chain=CGNAT_25 src-address=100.64.115.32/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_26 protocol=tcp src-address=100.64.115.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=53440-55455
+add action=netmap chain=CGNAT_26 protocol=udp src-address=100.64.115.64/27 \
+    to-addresses=177.53.166.32/27 to-ports=53440-55455
+add action=netmap chain=CGNAT_26 src-address=100.64.115.64/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_27 protocol=tcp src-address=100.64.115.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=55456-57471
+add action=netmap chain=CGNAT_27 protocol=udp src-address=100.64.115.96/27 \
+    to-addresses=177.53.166.32/27 to-ports=55456-57471
+add action=netmap chain=CGNAT_27 src-address=100.64.115.96/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_28 protocol=tcp src-address=100.64.115.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=57472-59487
+add action=netmap chain=CGNAT_28 protocol=udp src-address=100.64.115.128/27 \
+    to-addresses=177.53.166.32/27 to-ports=57472-59487
+add action=netmap chain=CGNAT_28 src-address=100.64.115.128/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_29 protocol=tcp src-address=100.64.115.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=59488-61503
+add action=netmap chain=CGNAT_29 protocol=udp src-address=100.64.115.160/27 \
+    to-addresses=177.53.166.32/27 to-ports=59488-61503
+add action=netmap chain=CGNAT_29 src-address=100.64.115.160/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_30 protocol=tcp src-address=100.64.115.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=61504-63519
+add action=netmap chain=CGNAT_30 protocol=udp src-address=100.64.115.192/27 \
+    to-addresses=177.53.166.32/27 to-ports=61504-63519
+add action=netmap chain=CGNAT_30 src-address=100.64.115.192/27 to-addresses=\
+    177.53.166.32/27
+add action=netmap chain=CGNAT_31 protocol=tcp src-address=100.64.115.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=63520-65535
+add action=netmap chain=CGNAT_31 protocol=udp src-address=100.64.115.224/27 \
+    to-addresses=177.53.166.32/27 to-ports=63520-65535
+add action=netmap chain=CGNAT_31 src-address=100.64.115.224/27 to-addresses=\
+    177.53.166.32/27
+add action=jump chain=srcnat jump-target=CGNAT_100_64_116 src-address=\
+    100.64.116.0/24
+add action=jump chain=srcnat jump-target=CGNAT_100_64_117 src-address=\
+    100.64.117.0/24
+add action=jump chain=srcnat jump-target=CGNAT_100_64_118 src-address=\
+    100.64.118.0/24
+add action=jump chain=srcnat jump-target=CGNAT_100_64_119 src-address=\
+    100.64.119.0/24
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_32 src-address=\
+    100.64.116.0/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_33 src-address=\
+    100.64.116.32/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_34 src-address=\
+    100.64.116.64/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_35 src-address=\
+    100.64.116.96/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_36 src-address=\
+    100.64.116.128/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_37 src-address=\
+    100.64.116.160/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_38 src-address=\
+    100.64.116.192/27
+add action=jump chain=CGNAT_100_64_116 jump-target=CGNAT_39 src-address=\
+    100.64.116.224/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_40 src-address=\
+    100.64.117.0/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_41 src-address=\
+    100.64.117.32/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_42 src-address=\
+    100.64.117.64/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_43 src-address=\
+    100.64.117.96/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_44 src-address=\
+    100.64.117.128/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_45 src-address=\
+    100.64.117.160/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_46 src-address=\
+    100.64.117.192/27
+add action=jump chain=CGNAT_100_64_117 jump-target=CGNAT_47 src-address=\
+    100.64.117.224/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_48 src-address=\
+    100.64.118.0/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_49 src-address=\
+    100.64.118.32/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_50 src-address=\
+    100.64.118.64/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_51 src-address=\
+    100.64.118.96/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_52 src-address=\
+    100.64.118.128/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_53 src-address=\
+    100.64.118.160/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_54 src-address=\
+    100.64.118.192/27
+add action=jump chain=CGNAT_100_64_118 jump-target=CGNAT_55 src-address=\
+    100.64.118.224/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_56 src-address=\
+    100.64.119.0/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_57 src-address=\
+    100.64.119.32/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_58 src-address=\
+    100.64.119.64/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_59 src-address=\
+    100.64.119.96/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_60 src-address=\
+    100.64.119.128/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_61 src-address=\
+    100.64.119.160/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_62 src-address=\
+    100.64.119.192/27
+add action=jump chain=CGNAT_100_64_119 jump-target=CGNAT_63 src-address=\
+    100.64.119.224/27
+add action=netmap chain=CGNAT_32 protocol=tcp src-address=100.64.116.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=1024-3039
+add action=netmap chain=CGNAT_32 protocol=udp src-address=100.64.116.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=1024-3039
+add action=netmap chain=CGNAT_32 src-address=100.64.116.0/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_33 protocol=tcp src-address=100.64.116.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=3040-5055
+add action=netmap chain=CGNAT_33 protocol=udp src-address=100.64.116.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=3040-5055
+add action=netmap chain=CGNAT_33 src-address=100.64.116.32/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_34 protocol=tcp src-address=100.64.116.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=5056-7071
+add action=netmap chain=CGNAT_34 protocol=udp src-address=100.64.116.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=5056-7071
+add action=netmap chain=CGNAT_34 src-address=100.64.116.64/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_35 protocol=tcp src-address=100.64.116.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=7072-9087
+add action=netmap chain=CGNAT_35 protocol=udp src-address=100.64.116.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=7072-9087
+add action=netmap chain=CGNAT_35 src-address=100.64.116.96/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_36 protocol=tcp src-address=100.64.116.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=9088-11103
+add action=netmap chain=CGNAT_36 protocol=udp src-address=100.64.116.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=9088-11103
+add action=netmap chain=CGNAT_36 src-address=100.64.116.128/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_37 protocol=tcp src-address=100.64.116.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=11104-13119
+add action=netmap chain=CGNAT_37 protocol=udp src-address=100.64.116.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=11104-13119
+add action=netmap chain=CGNAT_37 src-address=100.64.116.160/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_38 protocol=tcp src-address=100.64.116.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=13120-15135
+add action=netmap chain=CGNAT_38 protocol=udp src-address=100.64.116.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=13120-15135
+add action=netmap chain=CGNAT_38 src-address=100.64.116.192/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_39 protocol=tcp src-address=100.64.116.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=15136-17151
+add action=netmap chain=CGNAT_39 protocol=udp src-address=100.64.116.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=15136-17151
+add action=netmap chain=CGNAT_39 src-address=100.64.116.224/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_40 protocol=tcp src-address=100.64.117.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=17152-19167
+add action=netmap chain=CGNAT_40 protocol=udp src-address=100.64.117.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=17152-19167
+add action=netmap chain=CGNAT_40 src-address=100.64.117.0/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_41 protocol=tcp src-address=100.64.117.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=19168-21183
+add action=netmap chain=CGNAT_41 protocol=udp src-address=100.64.117.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=19168-21183
+add action=netmap chain=CGNAT_41 src-address=100.64.117.32/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_42 protocol=tcp src-address=100.64.117.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=21184-23199
+add action=netmap chain=CGNAT_42 protocol=udp src-address=100.64.117.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=21184-23199
+add action=netmap chain=CGNAT_42 src-address=100.64.117.64/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_43 protocol=tcp src-address=100.64.117.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=23200-25215
+add action=netmap chain=CGNAT_43 protocol=udp src-address=100.64.117.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=23200-25215
+add action=netmap chain=CGNAT_43 src-address=100.64.117.96/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_44 protocol=tcp src-address=100.64.117.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=25216-27231
+add action=netmap chain=CGNAT_44 protocol=udp src-address=100.64.117.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=25216-27231
+add action=netmap chain=CGNAT_44 src-address=100.64.117.128/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_45 protocol=tcp src-address=100.64.117.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=27232-29247
+add action=netmap chain=CGNAT_45 protocol=udp src-address=100.64.117.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=27232-29247
+add action=netmap chain=CGNAT_45 src-address=100.64.117.160/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_46 protocol=tcp src-address=100.64.117.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=29248-31263
+add action=netmap chain=CGNAT_46 protocol=udp src-address=100.64.117.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=29248-31263
+add action=netmap chain=CGNAT_46 src-address=100.64.117.192/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_47 protocol=tcp src-address=100.64.117.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=31264-33279
+add action=netmap chain=CGNAT_47 protocol=udp src-address=100.64.117.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=31264-33279
+add action=netmap chain=CGNAT_47 src-address=100.64.117.224/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_48 protocol=tcp src-address=100.64.118.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=33280-35295
+add action=netmap chain=CGNAT_48 protocol=udp src-address=100.64.118.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=33280-35295
+add action=netmap chain=CGNAT_48 src-address=100.64.118.0/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_49 protocol=tcp src-address=100.64.118.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=35296-37311
+add action=netmap chain=CGNAT_49 protocol=udp src-address=100.64.118.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=35296-37311
+add action=netmap chain=CGNAT_49 src-address=100.64.118.32/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_50 protocol=tcp src-address=100.64.118.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=37312-39327
+add action=netmap chain=CGNAT_50 protocol=udp src-address=100.64.118.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=37312-39327
+add action=netmap chain=CGNAT_50 src-address=100.64.118.64/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_51 protocol=tcp src-address=100.64.118.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=39328-41343
+add action=netmap chain=CGNAT_51 protocol=udp src-address=100.64.118.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=39328-41343
+add action=netmap chain=CGNAT_51 src-address=100.64.118.96/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_52 protocol=tcp src-address=100.64.118.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=41344-43359
+add action=netmap chain=CGNAT_52 protocol=udp src-address=100.64.118.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=41344-43359
+add action=netmap chain=CGNAT_52 src-address=100.64.118.128/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_53 protocol=tcp src-address=100.64.118.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=43360-45375
+add action=netmap chain=CGNAT_53 protocol=udp src-address=100.64.118.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=43360-45375
+add action=netmap chain=CGNAT_53 src-address=100.64.118.160/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_54 protocol=tcp src-address=100.64.118.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=45376-47391
+add action=netmap chain=CGNAT_54 protocol=udp src-address=100.64.118.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=45376-47391
+add action=netmap chain=CGNAT_54 src-address=100.64.118.192/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_55 protocol=tcp src-address=100.64.118.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=47392-49407
+add action=netmap chain=CGNAT_55 protocol=udp src-address=100.64.118.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=47392-49407
+add action=netmap chain=CGNAT_55 src-address=100.64.118.224/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_56 protocol=tcp src-address=100.64.119.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=49408-51423
+add action=netmap chain=CGNAT_56 protocol=udp src-address=100.64.119.0/27 \
+    to-addresses=177.53.166.64/27 to-ports=49408-51423
+add action=netmap chain=CGNAT_56 src-address=100.64.119.0/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_57 protocol=tcp src-address=100.64.119.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=51424-53439
+add action=netmap chain=CGNAT_57 protocol=udp src-address=100.64.119.32/27 \
+    to-addresses=177.53.166.64/27 to-ports=51424-53439
+add action=netmap chain=CGNAT_57 src-address=100.64.119.32/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_58 protocol=tcp src-address=100.64.119.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=53440-55455
+add action=netmap chain=CGNAT_58 protocol=udp src-address=100.64.119.64/27 \
+    to-addresses=177.53.166.64/27 to-ports=53440-55455
+add action=netmap chain=CGNAT_58 src-address=100.64.119.64/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_59 protocol=tcp src-address=100.64.119.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=55456-57471
+add action=netmap chain=CGNAT_59 protocol=udp src-address=100.64.119.96/27 \
+    to-addresses=177.53.166.64/27 to-ports=55456-57471
+add action=netmap chain=CGNAT_59 src-address=100.64.119.96/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_60 protocol=tcp src-address=100.64.119.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=57472-59487
+add action=netmap chain=CGNAT_60 protocol=udp src-address=100.64.119.128/27 \
+    to-addresses=177.53.166.64/27 to-ports=57472-59487
+add action=netmap chain=CGNAT_60 src-address=100.64.119.128/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_61 protocol=tcp src-address=100.64.119.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=59488-61503
+add action=netmap chain=CGNAT_61 protocol=udp src-address=100.64.119.160/27 \
+    to-addresses=177.53.166.64/27 to-ports=59488-61503
+add action=netmap chain=CGNAT_61 src-address=100.64.119.160/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_62 protocol=tcp src-address=100.64.119.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=61504-63519
+add action=netmap chain=CGNAT_62 protocol=udp src-address=100.64.119.192/27 \
+    to-addresses=177.53.166.64/27 to-ports=61504-63519
+add action=netmap chain=CGNAT_62 src-address=100.64.119.192/27 to-addresses=\
+    177.53.166.64/27
+add action=netmap chain=CGNAT_63 protocol=tcp src-address=100.64.119.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=63520-65535
+add action=netmap chain=CGNAT_63 protocol=udp src-address=100.64.119.224/27 \
+    to-addresses=177.53.166.64/27 to-ports=63520-65535
+add action=netmap chain=CGNAT_63 comment=ULTIMA-REGRA-NOVA src-address=\
+    100.64.119.224/27 to-addresses=177.53.166.64/27
+add action=jump chain=srcnat comment=PRIMEIRA-REGRA-ANTIGA disabled=yes \
+    jump-target=CGNAT_100_64_112 src-address=100.64.112.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_113 \
+    src-address=100.64.113.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_114 \
+    src-address=100.64.114.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_115 \
+    src-address=100.64.115.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_116 \
+    src-address=100.64.116.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_117 \
+    src-address=100.64.117.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_118 \
+    src-address=100.64.118.0/24
+add action=jump chain=srcnat disabled=yes jump-target=CGNAT_100_64_119 \
+    src-address=100.64.119.0/24
+add action=jump chain=CGNAT_100_64_112 disabled=yes jump-target=CGNAT_0 \
+    src-address=100.64.112.0/25
+add action=jump chain=CGNAT_100_64_112 disabled=yes jump-target=CGNAT_1 \
+    src-address=100.64.112.128/25
+add action=jump chain=CGNAT_100_64_113 disabled=yes jump-target=CGNAT_2 \
+    src-address=100.64.113.0/25
+add action=jump chain=CGNAT_100_64_113 disabled=yes jump-target=CGNAT_3 \
+    src-address=100.64.113.128/25
+add action=jump chain=CGNAT_100_64_114 disabled=yes jump-target=CGNAT_4 \
+    src-address=100.64.114.0/25
+add action=jump chain=CGNAT_100_64_114 disabled=yes jump-target=CGNAT_5 \
+    src-address=100.64.114.128/25
+add action=jump chain=CGNAT_100_64_115 disabled=yes jump-target=CGNAT_6 \
+    src-address=100.64.115.0/25
+add action=jump chain=CGNAT_100_64_115 disabled=yes jump-target=CGNAT_7 \
+    src-address=100.64.115.128/25
+add action=jump chain=CGNAT_100_64_116 disabled=yes jump-target=CGNAT_8 \
+    src-address=100.64.116.0/25
+add action=jump chain=CGNAT_100_64_116 disabled=yes jump-target=CGNAT_9 \
+    src-address=100.64.116.128/25
+add action=jump chain=CGNAT_100_64_117 disabled=yes jump-target=CGNAT_10 \
+    src-address=100.64.117.0/25
+add action=jump chain=CGNAT_100_64_117 disabled=yes jump-target=CGNAT_11 \
+    src-address=100.64.117.128/25
+add action=jump chain=CGNAT_100_64_118 disabled=yes jump-target=CGNAT_12 \
+    src-address=100.64.118.0/25
+add action=jump chain=CGNAT_100_64_118 disabled=yes jump-target=CGNAT_13 \
+    src-address=100.64.118.128/25
+add action=jump chain=CGNAT_100_64_119 disabled=yes jump-target=CGNAT_14 \
+    src-address=100.64.119.0/25
+add action=jump chain=CGNAT_100_64_119 disabled=yes jump-target=CGNAT_15 \
+    src-address=100.64.119.128/25
+add action=netmap chain=CGNAT_0 disabled=yes protocol=tcp src-address=\
+    100.64.112.0/25 to-addresses=177.53.166.128/25 to-ports=1024-5055
+add action=netmap chain=CGNAT_0 disabled=yes protocol=udp src-address=\
+    100.64.112.0/25 to-addresses=177.53.166.128/25 to-ports=1024-5055
+add action=netmap chain=CGNAT_0 disabled=yes src-address=100.64.112.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_1 disabled=yes protocol=tcp src-address=\
+    100.64.112.128/25 to-addresses=177.53.166.128/25 to-ports=5056-9087
+add action=netmap chain=CGNAT_1 disabled=yes protocol=udp src-address=\
+    100.64.112.128/25 to-addresses=177.53.166.128/25 to-ports=5056-9087
+add action=netmap chain=CGNAT_1 disabled=yes src-address=100.64.112.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_2 disabled=yes protocol=tcp src-address=\
+    100.64.113.0/25 to-addresses=177.53.166.128/25 to-ports=9088-13119
+add action=netmap chain=CGNAT_2 disabled=yes protocol=udp src-address=\
+    100.64.113.0/25 to-addresses=177.53.166.128/25 to-ports=9088-13119
+add action=netmap chain=CGNAT_2 disabled=yes src-address=100.64.113.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_3 disabled=yes protocol=tcp src-address=\
+    100.64.113.128/25 to-addresses=177.53.166.128/25 to-ports=13120-17151
+add action=netmap chain=CGNAT_3 disabled=yes protocol=udp src-address=\
+    100.64.113.128/25 to-addresses=177.53.166.128/25 to-ports=13120-17151
+add action=netmap chain=CGNAT_3 disabled=yes src-address=100.64.113.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_4 disabled=yes protocol=tcp src-address=\
+    100.64.114.0/25 to-addresses=177.53.166.128/25 to-ports=17152-21183
+add action=netmap chain=CGNAT_4 disabled=yes protocol=udp src-address=\
+    100.64.114.0/25 to-addresses=177.53.166.128/25 to-ports=17152-21183
+add action=netmap chain=CGNAT_4 disabled=yes src-address=100.64.114.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_5 disabled=yes protocol=tcp src-address=\
+    100.64.114.128/25 to-addresses=177.53.166.128/25 to-ports=21184-25215
+add action=netmap chain=CGNAT_5 disabled=yes protocol=udp src-address=\
+    100.64.114.128/25 to-addresses=177.53.166.128/25 to-ports=21184-25215
+add action=netmap chain=CGNAT_5 disabled=yes src-address=100.64.114.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_6 disabled=yes protocol=tcp src-address=\
+    100.64.115.0/25 to-addresses=177.53.166.128/25 to-ports=25216-29247
+add action=netmap chain=CGNAT_6 disabled=yes protocol=udp src-address=\
+    100.64.115.0/25 to-addresses=177.53.166.128/25 to-ports=25216-29247
+add action=netmap chain=CGNAT_6 disabled=yes src-address=100.64.115.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_7 disabled=yes protocol=tcp src-address=\
+    100.64.115.128/25 to-addresses=177.53.166.128/25 to-ports=29248-33279
+add action=netmap chain=CGNAT_7 disabled=yes protocol=udp src-address=\
+    100.64.115.128/25 to-addresses=177.53.166.128/25 to-ports=29248-33279
+add action=netmap chain=CGNAT_7 disabled=yes src-address=100.64.115.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_8 disabled=yes protocol=tcp src-address=\
+    100.64.116.0/25 to-addresses=177.53.166.128/25 to-ports=33280-37311
+add action=netmap chain=CGNAT_8 disabled=yes protocol=udp src-address=\
+    100.64.116.0/25 to-addresses=177.53.166.128/25 to-ports=33280-37311
+add action=netmap chain=CGNAT_8 disabled=yes src-address=100.64.116.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_9 disabled=yes protocol=tcp src-address=\
+    100.64.116.128/25 to-addresses=177.53.166.128/25 to-ports=37312-41343
+add action=netmap chain=CGNAT_9 disabled=yes protocol=udp src-address=\
+    100.64.116.128/25 to-addresses=177.53.166.128/25 to-ports=37312-41343
+add action=netmap chain=CGNAT_9 disabled=yes src-address=100.64.116.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_10 disabled=yes protocol=tcp src-address=\
+    100.64.117.0/25 to-addresses=177.53.166.128/25 to-ports=41344-45375
+add action=netmap chain=CGNAT_10 disabled=yes protocol=udp src-address=\
+    100.64.117.0/25 to-addresses=177.53.166.128/25 to-ports=41344-45375
+add action=netmap chain=CGNAT_10 disabled=yes src-address=100.64.117.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_11 disabled=yes protocol=tcp src-address=\
+    100.64.117.128/25 to-addresses=177.53.166.128/25 to-ports=45376-49407
+add action=netmap chain=CGNAT_11 disabled=yes protocol=udp src-address=\
+    100.64.117.128/25 to-addresses=177.53.166.128/25 to-ports=45376-49407
+add action=netmap chain=CGNAT_11 disabled=yes src-address=100.64.117.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_12 disabled=yes protocol=tcp src-address=\
+    100.64.118.0/25 to-addresses=177.53.166.128/25 to-ports=49408-53439
+add action=netmap chain=CGNAT_12 disabled=yes protocol=udp src-address=\
+    100.64.118.0/25 to-addresses=177.53.166.128/25 to-ports=49408-53439
+add action=netmap chain=CGNAT_12 disabled=yes src-address=100.64.118.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_13 disabled=yes protocol=tcp src-address=\
+    100.64.118.128/25 to-addresses=177.53.166.128/25 to-ports=53440-57471
+add action=netmap chain=CGNAT_13 disabled=yes protocol=udp src-address=\
+    100.64.118.128/25 to-addresses=177.53.166.128/25 to-ports=53440-57471
+add action=netmap chain=CGNAT_13 disabled=yes src-address=100.64.118.128/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_14 disabled=yes protocol=tcp src-address=\
+    100.64.119.0/25 to-addresses=177.53.166.128/25 to-ports=57472-61503
+add action=netmap chain=CGNAT_14 disabled=yes protocol=udp src-address=\
+    100.64.119.0/25 to-addresses=177.53.166.128/25 to-ports=57472-61503
+add action=netmap chain=CGNAT_14 disabled=yes src-address=100.64.119.0/25 \
+    to-addresses=177.53.166.128/25
+add action=netmap chain=CGNAT_15 disabled=yes protocol=tcp src-address=\
+    100.64.119.128/25 to-addresses=177.53.166.128/25 to-ports=61504-65535
+add action=netmap chain=CGNAT_15 comment=ULTIMA-REGRA-ANTIGA disabled=yes \
+    protocol=udp src-address=100.64.119.128/25 to-addresses=177.53.166.128/25 \
+    to-ports=61504-65535
+add action=same chain=srcnat same-not-by-dst=yes src-address=100.64.167.0/24 \
+    to-addresses=177.53.166.124/30
+add action=src-nat chain=srcnat src-address=100.64.254.0/30 to-addresses=\
+    177.53.166.124/30
+/ip firewall raw
+add action=drop chain=prerouting disabled=yes dst-port=\
+    0-1023,1900,5353,10001,11211 protocol=tcp src-address-list=!Permitidos
+add action=drop chain=prerouting disabled=yes dst-port=\
+    0-1023,1900,5353,10001,11211 protocol=udp src-address-list=!Permitidos
+add action=drop chain=prerouting disabled=yes protocol=tcp src-address-list=\
+    !Permitidos src-port=0-1023,1900,5353,10001,11211
+add action=drop chain=prerouting disabled=yes protocol=udp src-address-list=\
+    !Permitidos src-port=0-1023,1900,5353,10001,11211
+/ip route
+add distance=1 dst-address=10.255.1.2/32 gateway=10.65.0.2
+add comment=CGNAT-PROVISORIO distance=1 dst-address=177.53.166.32/27 type=\
+    blackhole
+add comment=CGNAT-PROVISORIO distance=1 dst-address=177.53.166.64/27 type=\
+    blackhole
+add distance=1 dst-address=177.53.166.124/30 type=blackhole
+add comment=CGNAT_BLACKHOLE disabled=yes distance=1 dst-address=\
+    177.53.166.128/25 type=blackhole
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set ssh port=65522
+set api address=177.53.166.3/32
+set winbox port=8217
+set api-ssl disabled=yes
+/ipv6 address
+add address=2804:bac:f:1601::2/126 advertise=no interface=vlan1601-EBGP-ROS
+add address=2804:bb0:ff00:0:7800:0:1:1/128 advertise=no interface=Loopback0
+add address=2804:bb0:ff00::1/126 advertise=no interface=vlan998-ospf-bng
+add address=2804:bb0:ff00:0:400::1/125 advertise=no interface=vlan3001-dns
+add address=2804:bf4::182/126 advertise=no interface=vlan531-EBGP-TVC
+add address=2804:bb0:ff00:0:400::9/126 advertise=no interface=\
+    vlan3003-speedtest
+/ipv6 route
+add disabled=yes distance=1 gateway=2804:bac:f:1601::1
+/ppp secret
+add name=procyon-vpn password=.12qwaszx. profile=VPN-Profile service=ovpn
+add name=nando-socialnet password=.12qwaszx. profile=VPN-Profile service=ovpn
+/routing bgp network
+add network=177.53.166.0/24 synchronize=no
+add network=2804:bb0:fc00::/38 synchronize=no
+/routing bgp peer
+add in-filter=EBGP-ROS-V4-IN name=EBGP-ROS-V4 out-filter=EBGP-ROS-V4-OUT \
+    remote-address=10.48.16.33 remote-as=262317
+add address-families=ipv6 in-filter=EBGP-ROS-V6-IN name=EBGP-ROS-V6 out-filter=\
+    EBGP-ROS-V6-OUT remote-address=2804:bac:f:1601::1 remote-as=262317
+add in-filter=EBGP-TVC-V4-IN name=EBGP-TVC-V4 out-filter=EBGP-TVC-V4-OUT \
+    remote-address=10.10.10.1 remote-as=263075
+add address-families=ipv6 in-filter=EBGP-TVC-V6-IN name=EBGP-TVC-V6 out-filter=\
+    EBGP-TVC-V6-OUT remote-address=2804:bf4::181 remote-as=263075
+/routing filter
+add action=accept chain=EBGP-ROS-V4-IN prefix=0.0.0.0/0 set-bgp-local-pref=500 \
+    set-pref-src=177.53.166.0
+add action=discard chain=EBGP-ROS-V4-IN
+add action=accept chain=EBGP-ROS-V4-OUT prefix=177.53.166.0/24
+add action=discard chain=EBGP-ROS-V4-OUT
+add action=accept chain=EBGP-ROS-V6-IN prefix=::/0 set-bgp-local-pref=500
+add action=discard chain=EBGP-ROS-V6-IN
+add action=accept chain=EBGP-ROS-V6-OUT prefix=2804:bb0:fc00::/38
+add action=discard chain=EBGP-ROS-V6-OUT
+add action=accept chain=EBGP-TVC-V4-IN prefix=0.0.0.0/0 set-bgp-local-pref=50 \
+    set-distance=50 set-pref-src=177.53.166.0
+add action=discard chain=EBGP-TVC-V4-IN
+add action=accept chain=EBGP-TVC-V4-OUT prefix=177.53.166.0/24 set-bgp-prepend=\
+    4
+add action=discard chain=EBGP-TVC-V4-OUT
+add action=accept chain=EBGP-TVC-V6-IN prefix=::/0 set-bgp-local-pref=50 \
+    set-distance=50
+add action=discard chain=EBGP-TVC-V6-IN
+add action=accept chain=EBGP-TVC-V6-OUT prefix=2804:bb0:fc00::/38 \
+    set-bgp-prepend=4
+add action=discard chain=EBGP-TVC-V6-OUT
+/routing ospf interface
+add interface=Loopback1 network-type=point-to-point
+add interface=vlan998-ospf-bng network-type=point-to-point
+add interface=vlan997-ospf-1009 network-type=point-to-point
+/routing ospf network
+add area=backbone network=10.255.1.1/32
+add area=backbone network=10.65.0.4/30
+add area=backbone network=10.65.0.24/30
+/routing ospf-v3 interface
+add area=backbone interface=vlan998-ospf-bng network-type=point-to-point
+/snmp
+set enabled=yes
+/system clock
+set time-zone-name=America/Sao_Paulo
+/system identity
+set name=SP-PQB-A01-BDR-RT-001
+/system ntp client
+set enabled=yes primary-ntp=200.160.0.8 secondary-ntp=200.189.40.8
+/system routerboard settings
+set enter-setup-on=delete-key
+/system scheduler
+add interval=1d name=bkp-procyon on-event=bkp-procyon policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon \
+    start-date=jan/10/2024 start-time=00:00:00
+/system script
+add dont-require-permissions=no name=bkp-procyon owner=bruno-procyon policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source=":lo\
+    cal username \"bkpftpsocial\"\r\
+    \n:local password \"!@#Social2401\"\r\
+    \n:local ftpserver \"191.252.193.112\"\r\
+    \n\r\
+    \n# months array\r\
+    \n:local months (\"jan\",\"feb\",\"mar\",\"apr\",\"may\",\"jun\",\"jul\",\"a\
+    ug\",\"sep\",\"oct\",\"nov\",\"dec\");\r\
+    \n\r\
+    \n# get time\r\
+    \n:local ts [/system clock get time]\r\
+    \n:set ts ([:pick \$ts 0 2].[:pick \$ts 3 5].[:pick \$ts 6 8])\r\
+    \n\r\
+    \n# get Date\r\
+    \n:local ds [/system clock get date]\r\
+    \n# convert name of month to number\r\
+    \n:local month [ :pick \$ds 0 3 ];\r\
+    \n:local mm ([ :find \$months \$month -1 ] + 1);\r\
+    \n:if (\$mm < 10) do={ :set mm (\"0\" . \$mm); }\r\
+    \n# set \$ds to format YYYY-MM-DD\r\
+    \n:set ds ([:pick \$ds 7 11] . \$mm . [:pick \$ds 4 6])\r\
+    \n\r\
+    \n# file name for config export - file name will be UMDB-servername-date-tim\
+    e.rsc\r\
+    \n:local filename ([/system identity get name].\"-\".\$ds.\"-\".\$ts.\".rsc\
+    \")\r\
+    \n\r\
+    \n# backup the data\r\
+    \n#/tool user-manager database save name=\$filename\r\
+    \n/export compact file=\$filename\r\
+    \n:log warning message=\"Config export finished (2/2).\"\r\
+    \n\r\
+    \n# Upload backup file to FTP server.\r\
+    \n\r\
+    \n/tool fetch address=\$ftpserver src-path=\"\$filename\" \\\r\
+    \nuser=\$username mode=ftp password=\$password \\\r\
+    \ndst-path=\"/Mikrotiks/SOCIALNET/SP-PQB-A01-BDR-RT-001/\$filename\" upload=\
+    yes\r\
+    \n\r\
+    \n:log info \"Backup Uploaded Successfully\"\r\
+    \n\r\
+    \n# Delete created backup files once they have been uploaded\r\
+    \n# so they don't accumulate and fill up storage space on the router.\r\
+    \n\r\
+    \n/file remove \"\$filename\"\r\
+    \n\r\
+    \n:log info \"Local Backup Files Deleted Successfully\"\r\
+    \n"
+/tool romon
+set enabled=yes secrets=smf0705
+[hemily@SP-PQB-A01-BDR-RT-001] > 
