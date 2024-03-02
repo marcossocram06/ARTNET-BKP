@@ -1,0 +1,1000 @@
+ss 200.187.87.226 - received NAK from dhcp server 192.168.0.1
+jan/10/2024 15:07:24 dhcp,critical,error dhcp-client on ether1-LINK_ADSL-DHCP lost
+ IP address 186.224.169.121 - lease expired
+[hemily@002-RT-BNG-BFT-002] > export 
+# mar/02/2024 11:28:14 by RouterOS 6.49.11
+# software id = 58MH-H7Y6
+#
+# model = CCR2004-1G-12S+2XS
+# serial number = D4F10D448CF0
+/interface bridge
+add name=Loopback protocol-mode=none
+/interface ethernet
+set [ find default-name=ether1 ] comment="LINK ADSL"
+set [ find default-name=sfp-sfpplus1 ] comment="SWITCH 10G"
+set [ find default-name=sfp-sfpplus2 ] advertise=\
+    10M-half,10M-full,100M-half,100M-full,1000M-half,1000M-full,10000M-full \
+    comment="LINK ADSL 2"
+/interface vlan
+add interface=sfp-sfpplus1 name=VLAN-97-UNTAG-PORTA-8-SW vlan-id=97
+add interface=sfp-sfpplus1 name=VLAN-1001-LINK-PBG-BKP-IN-OUT vlan-id=1001
+add interface=sfp-sfpplus1 name=VLAN-1002-LINK-BFT1 vlan-id=1002
+add interface=sfp-sfpplus1 name=VLAN-2050-CLIENTE-OLT-ZTE vlan-id=2050
+add interface=sfp-sfpplus1 name=VLAN_2053_IPV6 vlan-id=2053
+add disabled=yes interface=sfp-sfpplus1 name=Vlan98 vlan-id=98
+add interface=sfp-sfpplus1 name=vlan-350-ALPES vlan-id=350
+add disabled=yes interface=sfp-sfpplus1 name=vlan2000 vlan-id=2000
+/interface list
+add name=WAN
+add name=LAN
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=MikroTik
+/ip pool
+add name=PPPoE ranges=100.65.96.0/22
+add comment="Aviso Atraso IXCSoft" name=pool_aviso_atraso ranges=172.20.19.0/24
+add comment="Bloqueio IXCSoft" name=pool_bloqueio ranges=172.21.20.0/24
+add comment="Aguardando Assinatura IXCSoft" name=pool_aguardando_assinatura \
+    ranges=172.22.21.0/24
+add name=vpn ranges=192.168.89.2-192.168.89.255
+/ipv6 pool
+add name=PX-WAN prefix=2804:2178:444::/47 prefix-length=64
+add name=PX-PD-LAN prefix=2804:2178:446::/47 prefix-length=60
+add name=pool_aviso_bloqueio_ipv6 prefix=2001:db8::/32 prefix-length=48
+/ppp profile
+add dhcpv6-pd-pool=PX-PD-LAN dns-server=8.8.4.4,1.1.1.1 local-address=\
+    10.255.255.4 name=PPPoE remote-address=PPPoE remote-ipv6-prefix-pool=PX-WAN
+add comment="{{IXCSoft Aviso de Atraso}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    pool_aviso_atraso rate-limit="" remote-address=pool_aviso_atraso
+add comment="{{IXCSoft Aviso de Bloqueio}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    pool_bloqueio rate-limit="" remote-address=pool_bloqueio
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    10_megas_fibra_Torre_Pedra rate-limit="5120k/10240k 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    5_MB_90_Valencia_Extinto rate-limit="2000k/5000k 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=5_megas_150 \
+    rate-limit="5128k/5128k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=5_Megas_Fibra_Torre \
+    rate-limit="5048k/5048k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=5_megas_Sete_N_90 \
+    rate-limit="2048k/5128k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_25MB_PJ \
+    rate-limit="15000k/25000k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_60MB_PJ \
+    rate-limit="61440k/61440k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Radio_15MB_PF \
+    rate-limit="7168k/15360k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Radio_8MB_PF \
+    rate-limit="4096k/8192k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Radio_Rural_5MB_PF rate-limit="3M/5M 4M/8M 3M/5M 16/16  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Radio_Rural_10MB_PF rate-limit="5M/10M 6M/12M 5M/10M 16/16  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Radio_Rural_5MB_PJ rate-limit="3M/5M 4M/8M 3M/5M 16/16  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Vale_Verde_Fibra_100MB_PF rate-limit=\
+    "51200k/102400k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Vale_Verde_Fibra_50MB_PF rate-limit=\
+    "25600k/51200k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Pardinho_15MB_PF \
+    rate-limit="7680k/15360k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Pardinho_5MB_PF \
+    rate-limit="2560k/5120k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Plano_100MB_Dedicado \
+    rate-limit="102400k/102400k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=10_MB_Francinelma \
+    rate-limit="5M/10M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_100MB_PF_Igreja rate-limit="50M/100M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    10_megas_fibra_Bofete_Fazenda_Santa_Celina rate-limit=\
+    "5M/10M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Radio_Rural_5MB_PJ_Extracao rate-limit="3M/5M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_25MB_PF_62 rate-limit="13M/25M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_25MB_PF_50 rate-limit="13M/25M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Vale_Verde_Fibra_50MB_PF_99 rate-limit="25M/50M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Radio_15MB_PF_89 rate-limit="8M/15M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Radio_8MB_PF_99 rate-limit="4M/8M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Plano_100MB_Dedicado_130 rate-limit="50M/100M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_25MB_PF_90 rate-limit="13M/25M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=10_mega_73_Extinto \
+    rate-limit="5M/10M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=10_megas_Bofete \
+    rate-limit="8192k/12288k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_20MB_PF \
+    rate-limit="15M/30M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    50_megas_Torre_de_Pedra rate-limit="25600k/51200k 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_600_MB \
+    rate-limit="650M/650M 700M/700M 700M/700M 16/16  1 600M/700M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Victor_50MB \
+    rate-limit="50M/50M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=100Megas_69 \
+    rate-limit="70M/120M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=10_MB_90 rate-limit=\
+    "5M/10M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Alpes_20MB_120 \
+    rate-limit="10M/20M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Pardinho_30MB_PF \
+    rate-limit="15M/30M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=15_Mega_79 \
+    rate-limit="10M/20M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_520MB_PF \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 600M/600M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Torre_Fibra_450MB \
+    rate-limit="230M/450M 240M/470M 230M/450M 16/16  1 230M/450M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_520MB \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 600M/600M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_520_MB2 \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 600M/600M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Torre_Fibra_520MB_99 \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 350M/200M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TorreTV_520_MB \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 350M/350M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TorreTV_520MB \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 350M/350M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Torre_Fibra_780MB_PF \
+    rate-limit="900M/900M 900M/900M 900M/900M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=800MB_Exclusivo \
+    rate-limit="900M/900M 900M/900M 900M/900M 16/16  1 230M/470M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_1000MB_PF rate-limit=\
+    "1024M/1024M 1500M/1500M 1500M/1500M 16/16  1 900M/900M" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Torre_Fibra_1000MB_PF \
+    rate-limit="1024M/1024M 1500M/1500M 1500M/1500M 16/16  1 600M/700M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_600MB_PF_Exclusivo rate-limit=\
+    "700M/700M 700M/700M 700M/700M 16/16  1 50M/100M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=15_megas_99 \
+    rate-limit="30M/30M 30M/30M 30M/30M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=15_Megas_150 \
+    rate-limit="30M/30M 30M/30M 30M/30M 16/16  1 30M/30M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=50MB_PF_70 \
+    rate-limit="25600k/51200k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=20_Mega_90 \
+    rate-limit="10M/20M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_780MB_PF \
+    rate-limit="900M/900M 900M/900M 900M/900M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Anhembi_Fibra_520MB_PF rate-limit=\
+    "600M/600M 600M/600M 600M/600M 16/16  1 600M/600M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_800MB_PF_129 rate-limit=\
+    "900M/900M 900M/900M 900M/900M 16/16  1 900M/900M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Prefeitura_Fibra_100MB rate-limit="50M/100M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Piramboia_Fibra_80MB \
+    rate-limit="100M/100M 150M/150M 100M/100M 16/16  1 100M/100M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_520_exclusivo \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Anhembi_Fibra_780MB_PF rate-limit=\
+    "900M/900M 900M/900M 900M/900M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_50MB_PF \
+    rate-limit="100M/100M 100M/100M 100M/100M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_520_MB3 \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_90_5MB_rural \
+    rate-limit="10M/10M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Torre_Saltinho_Fibra_520MB_PF rate-limit=\
+    "600M/600M 600M/600M 600M/600M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Fibra_700MB_PF_129 \
+    rate-limit="800M/800M 800M/800M 800M/800M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Paco_Municipal_Bofete \
+    rate-limit="1024M/1024M 1500M/1500M 1500M/1500M 16/16  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Fibra_300MB_99 \
+    rate-limit="350M/350M 0/0 0/0 16/16  1 350M/350M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=300_megas_240_Bofete \
+    rate-limit="300M/300M 300M/300M 300M/300M 16/16  1 300M/300M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=10MB_CPR rate-limit=\
+    "10M/10M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=20_Mega_71 \
+    rate-limit="25M/25M 25M/25M 25M/25M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=500 rate-limit=\
+    "150600k/150200k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_150MB_PF_79 rate-limit=\
+    "170M/170M 170M/170M 170M/170M 16/16  1 75M/150M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=5_Megas_rural_90 \
+    rate-limit="10M/10M 10M/10M 10M/10M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Anhembi_Fibra_150MB_PF rate-limit=\
+    "200M/200M 200M/200M 200M/200M 16/16  1 100M/100M" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Torre_Fibra_150MB_PF \
+    rate-limit="200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Bofete_Fibra_150MB_PF \
+    rate-limit="200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Combo_TV_150MB_Anhembi rate-limit=\
+    "200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Combo_TV_520MB_Anhembi rate-limit=\
+    "600M/600M 600M/600M 600M/600M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_150MB_ll \
+    rate-limit="200M/200M 200M/200M 200M/200M 16/16  1 100M/100M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_TV_150_MB \
+    rate-limit="200M/200M 200M/200M 200M/200M 16/16  1 100M/100M" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=20_megas_rural_120 \
+    rate-limit="30M/30M 30M/30M 30M/30M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_7_MEGAS \
+    rate-limit="8M/8M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_75_MB_U \
+    rate-limit="39M/73M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_5_MEGAS_VALMIR \
+    rate-limit="7M/15M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_5_MEGAS \
+    rate-limit="3M/6M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_50_MEGAS_U \
+    rate-limit="24M/49M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_50_MEGAS_R \
+    rate-limit="24M/49M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_500_MEGAS_U \
+    rate-limit="254M/498M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_3_MEGAS \
+    rate-limit="2M/4M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_300_MEGAS_URBANO rate-limit="156M/303M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_300_MEGAS_RURAL_PORANGABA rate-limit="156M/293M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_300_MEGAS_RURAL_BOFETE rate-limit="156M/303M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_25_MEGAS_R \
+    rate-limit="10M/24M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_20_MEGAS_U \
+    rate-limit="10M/24M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_200_MEGAS_RURAL_BOFETE rate-limit="107M/205M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_15_MEGAS \
+    rate-limit="15M/15M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_100_MEGAS_RURAL_PORANGABA rate-limit="59M/107M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_100_MB_URBANO \
+    rate-limit="59M/107M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=520MB_Fibra_Rural \
+    rate-limit="600M/600M 600M/600M 600M/600M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=PLANO_150_MEGAS_RURAL \
+    rate-limit="200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Porangaba_Fibra_520MB_PF rate-limit=\
+    "600M/600M 600M/600M 600M/600M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Porangaba_Fibra_150MB_PF rate-limit=\
+    "200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=780MB_Rural_129 \
+    rate-limit="900M/900M 900M/900M 900M/900M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Combo_780_1 \
+    rate-limit="800M/800M 800M/800M 800M/800M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_1000_IP_PF rate-limit="1000M/1000M 0/0 0/0 0/0  1 0/0" \
+    remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Alpes_10MB_90 \
+    rate-limit="5120k/10240k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    50MB_Baronesa_CAlegre_Mina rate-limit=\
+    "80M/80M 80M/80M 80M/80M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=Torre_Fibra_200MB \
+    rate-limit="60M/120M 70M/140M 60M/60M 16/16  1 60M/120M" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Bofete_Fibra_520MB_250 rate-limit=\
+    "700M/700M 700M/700M 700M/700M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_150_MEGAS_URBANO rate-limit=\
+    "200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=300MB_Fibra \
+    rate-limit="180000k/350000k 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=300MB_fibra_109 \
+    rate-limit="512M/512M 0/0 0/0 0/0  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=150_MB_IP_Fixo \
+    rate-limit="200M/200M 200M/200M 200M/200M 16/16  1 0/0" remote-address=\
+    PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    PLANO_780_MEGAS_RURAL_PORANGABA rate-limit=\
+    "800M/800M 800M/800M 800M/800M 16/16  1 0/0" remote-address=PPPoE
+add comment="{{IXCSoft}}" dns-server=8.8.8.8,4.4.4.4 name=\
+    Torre_Saltinho_Fibra_600MB_PF rate-limit=\
+    "600M/600M 600M/620M 600M/600M 16/16  1 300M/600M" remote-address=PPPoE
+set *FFFFFFFE local-address=192.168.89.1 remote-address=vpn
+/routing ospf area
+add area-id=0.0.0.1 default-cost=1 inject-summary-lsas=yes name=area1 type=stub
+/routing ospf instance
+set [ find default=yes ] distribute-default=always-as-type-1 \
+    redistribute-connected=as-type-1 redistribute-static=as-type-1 router-id=\
+    10.255.255.4
+/snmp community
+set [ find default=yes ] name=artnet-ro
+/ip neighbor discovery-settings
+set discover-interface-list=!dynamic
+/interface l2tp-server server
+set enabled=yes ipsec-secret=!@#banana123 use-ipsec=yes
+/interface list member
+add interface=ether1 list=WAN
+add list=LAN
+/interface pppoe-server server
+add authentication=pap default-profile=PPPoE interface=\
+    VLAN-2050-CLIENTE-OLT-ZTE keepalive-timeout=30 max-mru=1492 max-mtu=1492 \
+    one-session-per-host=yes service-name=PPPoE-SERVER-VLAN2050
+add authentication=pap default-profile=PPPoE interface=VLAN-97-UNTAG-PORTA-8-SW \
+    keepalive-timeout=30 max-mru=1492 max-mtu=1492 one-session-per-host=yes \
+    service-name=service2
+add authentication=pap default-profile=PPPoE interface=vlan2000 max-mru=1492 \
+    max-mtu=1492 one-session-per-host=yes service-name=service3
+add authentication=pap default-profile=PPPoE interface=vlan-350-ALPES \
+    keepalive-timeout=30 max-mru=1492 max-mtu=1492 one-session-per-host=yes \
+    service-name=service-ppoe-alpes
+/interface pptp-server server
+set enabled=yes
+/interface sstp-server server
+set default-profile=default-encryption enabled=yes
+/ip address
+add address=172.30.0.21/30 interface=VLAN-1002-LINK-BFT1 network=172.30.0.20
+add address=10.255.255.4 interface=Loopback network=10.255.255.4
+add address=172.30.0.17/30 interface=VLAN-1001-LINK-PBG-BKP-IN-OUT network=\
+    172.30.0.16
+add address=10.8.8.1/30 interface=vlan2000 network=10.8.8.0
+add address=100.100.100.1/24 interface=sfp-sfpplus1 network=100.100.100.0
+add address=192.168.148.1/24 interface=VLAN-97-UNTAG-PORTA-8-SW network=\
+    192.168.148.0
+add address=10.69.0.1/30 disabled=yes interface=Vlan98 network=10.69.0.0
+/ip cloud
+set ddns-enabled=yes
+/ip dhcp-client
+add default-route-distance=199 disabled=no interface=ether1
+add default-route-distance=111 disabled=no interface=sfp-sfpplus2
+/ip dns
+set servers=8.8.8.8,1.1.1.1,2001:4860:4860::8888
+/ip firewall address-list
+add address=192.168.148.0/24 list=rede_local
+add address=100.65.99.235 list="SAIR ADSL"
+add address=207.248.10.142 comment="IXCProvedor endereco IP do sistema" list=\
+    rede_local
+add address=www.tjpr.jus.br list=sites_liberados
+add address=100.65.102.128 list="SAIR ADSL"
+add address=10.255.255.11 list="SAIR ADSL"
+add address=10.255.255.11 list=no_nat
+add address=100.65.102.128 list=no_nat
+add address=100.65.99.235 list=no_nat
+/ip firewall filter
+add action=drop chain=forward src-address=172.21.20.0/24
+add action=accept chain=forward dst-address=177.20.169.2
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 protocol=tcp src-address=172.21.20.0/24
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 protocol=tcp src-address-list=aviso_bloqueio
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-port=!53 protocol=udp src-address=172.21.20.0/24
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-port=!53 protocol=udp src-address-list=aviso_bloqueio
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    protocol=tcp src-address=172.22.21.0/24
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    protocol=tcp src-address-list=aguardando_assinatura
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-port=!53 protocol=udp \
+    src-address=172.22.21.0/24
+add action=drop chain=forward comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-port=!53 protocol=udp \
+    src-address-list=aguardando_assinatura
+add action=fasttrack-connection chain=forward connection-state=\
+    established,related disabled=yes
+/ip firewall nat
+add action=dst-nat chain=dstnat dst-address=186.224.175.216 dst-port=8088 \
+    protocol=udp to-addresses=100.65.103.218 to-ports=8088
+add action=src-nat chain=srcnat src-address=172.21.20.0/24 to-addresses=\
+    10.10.10.10
+add action=masquerade chain=srcnat disabled=yes dst-address=177.20.169.2 \
+    dst-port=443,80 protocol=tcp
+add action=masquerade chain=srcnat dst-address=45.6.32.38 dst-port=443,80 \
+    protocol=tcp
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso atraso" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address=\
+    172.20.19.0/24 to-addresses=207.248.10.142 to-ports=8083
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso atraso" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address-list=\
+    aviso_atraso to-addresses=207.248.10.142 to-ports=8083
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address=\
+    172.21.20.0/24 to-addresses=207.248.10.142 to-ports=8082
+add action=dst-nat chain=dstnat comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!207.248.10.142 dst-port=80 protocol=tcp src-address-list=\
+    aviso_bloqueio to-addresses=207.248.10.142 to-ports=8082
+add action=dst-nat chain=dstnat comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    dst-port=80 protocol=tcp src-address=172.22.21.0/24 to-addresses=\
+    207.248.10.142 to-ports=8086
+add action=dst-nat chain=dstnat comment=\
+    "IXCProvedor regra de aguardando assinatura" dst-address=!207.248.10.142 \
+    dst-port=80 protocol=tcp src-address-list=aguardando_assinatura \
+    to-addresses=207.248.10.142 to-ports=8086
+add action=masquerade chain=srcnat comment="masq. vpn traffic" src-address=\
+    192.168.89.0/24
+add action=dst-nat chain=dstnat dst-address=186.224.163.26 dst-port=6639 \
+    protocol=tcp to-addresses=172.31.254.26 to-ports=23
+add action=dst-nat chain=dstnat dst-address=186.224.169.197 dst-port=61444 \
+    protocol=tcp to-addresses=100.65.103.23 to-ports=443
+add action=dst-nat chain=dstnat comment="DVR SILVIO" dst-address=186.224.172.31 \
+    dst-port=34970 protocol=tcp to-addresses=10.1.254.5 to-ports=34970
+/ip firewall raw
+add action=accept chain=prerouting dst-address-list=sites_liberados
+/ip route
+add distance=2 gateway=172.30.0.22 scope=20
+add check-gateway=ping distance=1 dst-address=45.6.32.36/30 gateway=172.30.0.22 \
+    scope=20
+add distance=1 dst-address=45.6.32.60/30 gateway=172.30.0.22 pref-src=\
+    172.30.0.21 scope=10
+/ip route rule
+add disabled=yes dst-address=0.0.0.0/0 src-address=100.65.96.0/23 table=\
+    LINK-BFD-01
+/ip service
+set telnet disabled=yes
+set ftp address=191.252.60.142/32
+set www disabled=yes
+set ssh disabled=yes
+set api address=191.252.60.142/32,207.248.10.142/32
+set winbox port=8260
+/ipv6 address
+add address=2804:2178:400::e/126 advertise=no interface=VLAN_2053_IPV6
+/ipv6 nd
+set [ find default=yes ] other-configuration=yes
+/ipv6 route
+add distance=1 gateway=2804:2178:400::d
+/ppp aaa
+set interim-update=20m use-radius=yes
+/ppp secret
+add name=ppnetwork password=123@mudar profile=PPPoE
+add name=ppnetwork password=123@mudar profile=PPPoE service=pptp
+add name=gui password=bol15172526 service=pppoe
+add name=teste.roteador password=roteador service=pppoe
+add name=poio password=poio profile=PPPoE service=pppoe
+add name=poio2 password=poio2 profile=PPPoE service=pppoe
+add name=vpn
+add name=vpn-procyon password=1q2w3e4r5T!@# service=l2tp
+add name=artnet.casamento password=casamento
+add name=artnet.campos password=sales
+add name=festa.rodeio2 password=rodeio2023 profile=PPPoE service=pppoe
+add name=dvr.delegacia password=@delegacia service=pppoe
+add name=nvr.delegacia password=@delegacia service=pppoe
+add name=pre password=pre profile=PPPoE service=pppoe
+add caller-id=80:2A:A8:28:F4:B0 comment="{IXCSoft PPPOE -> roberto.araujo}" \
+    disabled=yes name=roberto.araujo password=duarte profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:18:D6:4C:43:76 comment="{IXCSoft PPPOE -> giovana.trevisan}" \
+    disabled=yes name=giovana.trevisan password=garcia profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:86:AB:BA comment="{IXCSoft PPPOE -> dirceu.mlalzer}" \
+    disabled=yes name=dirceu.mlalzer password=peres profile=15_Mega_79 service=\
+    pppoe
+add caller-id=58:10:8C:4A:1D:2F comment="{IXCSoft PPPOE -> noel.candido125}" \
+    disabled=yes name=noel.candido125 password=reis profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:A4:3C:68:DD:75 comment="{IXCSoft PPPOE -> gisele.ricarda478}" \
+    disabled=yes name=gisele.ricarda478 password=costa profile=Pardinho_30MB_PF \
+    service=pppoe
+add caller-id=00:BE:9E:6D:73:B0 comment=\
+    "{IXCSoft PPPOE -> alvaro.aparecido698}" disabled=yes name=\
+    alvaro.aparecido698 password=junior profile=pool_bloqueio service=pppoe
+add caller-id=58:10:8C:5F:54:B5 comment=\
+    "{IXCSoft PPPOE -> gustavo.jeremias123}" disabled=yes name=\
+    gustavo.jeremias123 password=bc2512a8 profile=pool_bloqueio service=pppoe
+add caller-id=58:10:8C:61:07:FD comment="{IXCSoft PPPOE -> otavio.souza785}" \
+    disabled=yes name=otavio.souza785 password=neto profile=pool_bloqueio \
+    service=pppoe
+add caller-id=00:27:22:B6:02:35 comment="{IXCSoft PPPOE -> leandro.vieira}" \
+    disabled=yes name=leandro.vieira password=xavier profile=pool_bloqueio \
+    service=pppoe
+add caller-id=58:10:8C:58:A4:65 comment="{IXCSoft PPPOE -> bianca.moura}" \
+    disabled=yes name=bianca.moura password=moura profile=pool_bloqueio \
+    service=pppoe
+add caller-id=80:2A:A8:78:22:4A comment="{IXCSoft PPPOE -> joao.carlos}" \
+    disabled=yes name=joao.carlos password=seviero profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> leandro.castelloes851}" disabled=yes name=\
+    leandro.castelloes851 password=costato profile=pool_bloqueio service=pppoe
+add comment="{IXCSoft PPPOE -> francisco.fogaca}" disabled=yes name=\
+    francisco.fogaca password=almeida profile=pool_bloqueio service=pppoe
+add comment="{IXCSoft PPPOE -> claudionor.alves}" disabled=yes name=\
+    claudionor.alves password=rosa profile=pool_bloqueio service=pppoe
+add caller-id=04:18:D6:F6:3C:D2 comment="{IXCSoft PPPOE -> vanessa.martins99}" \
+    disabled=yes name=vanessa.martins99 password=martins profile=pool_bloqueio \
+    service=pppoe
+add caller-id=58:10:8C:61:B9:B2 comment="{IXCSoft PPPOE -> eduarda.jacinto883}" \
+    disabled=yes name=eduarda.jacinto883 password=jacinto profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> tiago.cristiano25}" disabled=yes name=\
+    tiago.cristiano25 password=j7s92 profile=pool_bloqueio service=pppoe
+add caller-id=18:0D:2C:00:4A:F7 comment="{IXCSoft PPPOE -> robson.pereira56}" \
+    disabled=yes name=robson.pereira56 password=pereira profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:FD:0D:5D:46:AF comment="{IXCSoft PPPOE -> odiney.machado}" \
+    disabled=yes name=odiney.machado password=machado profile=pool_bloqueio \
+    service=pppoe
+add caller-id=00:27:22:3A:74:96 comment="{IXCSoft PPPOE -> taires.souza.50}" \
+    disabled=yes name=taires.souza.50 password=santos profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:1F:53:32 comment="{IXCSoft PPPOE -> fazenda.celina1301}" \
+    disabled=yes name=fazenda.celina1301 password=2987xz83 profile=\
+    pool_bloqueio service=pppoe
+add caller-id=04:18:D6:4A:19:CE comment="{IXCSoft PPPOE -> maria.rosario50}" \
+    disabled=yes name=maria.rosario50 password=98537 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:BC:6D:92 comment="{IXCSoft PPPOE -> edilaine.jesus45}" \
+    disabled=yes name=edilaine.jesus45 password=a7kb6 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:1F:56:00 comment="{IXCSoft PPPOE -> claudinor.bento5}" \
+    disabled=yes name=claudinor.bento5 password=2l58c profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:8A:20:96:D0:09 comment="{IXCSoft PPPOE -> elizabete.duarte75}" \
+    disabled=yes name=elizabete.duarte75 password=a9c38 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=58:10:8C:58:A4:61 comment="{IXCSoft PPPOE -> paula.rodrigues58}" \
+    disabled=yes name=paula.rodrigues58 password=7hf87 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=98:00:6A:67:83:54 comment="{IXCSoft PPPOE -> paula.silva82}" \
+    disabled=yes name=paula.silva82 password=dxu8u profile=pool_bloqueio \
+    service=pppoe
+add caller-id=00:27:22:20:3B:91 comment="{IXCSoft PPPOE -> tereza.amaral59}" \
+    disabled=yes name=tereza.amaral59 password=6uu64 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:FD:0D:C1:97:4F comment="{IXCSoft PPPOE -> helena.carvalho67}" \
+    disabled=yes name=helena.carvalho67 password=nl9c6 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=54:DF:24:F3:0E:30 comment="{IXCSoft PPPOE -> luiz.felipe79}" \
+    disabled=yes name=luiz.felipe79 password=7gu15 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:59:43:52:8E:14 comment="{IXCSoft PPPOE -> tiago.santos97}" \
+    disabled=yes name=tiago.santos97 password=l8le4 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=DC:9F:DB:10:B8:C7 comment="{IXCSoft PPPOE -> helida.freire21}" \
+    disabled=yes name=helida.freire21 password=23569 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:A0:2D:F7 comment="{IXCSoft PPPOE -> andre.silva44}" \
+    disabled=yes name=andre.silva44 password=b4sj2 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:80:04:84 comment=\
+    "{IXCSoft PPPOE -> cristiane.nascimento77}" disabled=yes name=\
+    cristiane.nascimento77 password=7m65t profile=pool_bloqueio service=pppoe
+add caller-id=04:18:D6:96:24:11 comment="{IXCSoft PPPOE -> jolini.alzani120}" \
+    disabled=yes name=jolini.alzani120 password=f76zp profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:28:61:18:EC:32 comment="{IXCSoft PPPOE -> natalino.model}" \
+    disabled=yes name=natalino.model password=r9w28 profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> maria.porto}" disabled=yes name=maria.porto \
+    password=9qk5v profile=pool_bloqueio service=pppoe
+add caller-id=44:3B:32:CC:8B:0A comment="{IXCSoft PPPOE -> wesley.barbosa429}" \
+    disabled=yes name=wesley.barbosa429 password=5jlr8 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=80:8F:E8:DD:56:0F comment="{IXCSoft PPPOE -> lais.galdino46}" \
+    disabled=yes name=lais.galdino46 password=cz467 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:A4:3C:00:15:82 comment="{IXCSoft PPPOE -> jose.acacio45}" \
+    disabled=yes name=jose.acacio45 password=8kxsi profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:17:35:ED:9B:74 comment=\
+    "{IXCSoft PPPOE -> aparecido.donizetti002}" disabled=yes name=\
+    aparecido.donizetti002 password=5f922 profile=pool_bloqueio service=pppoe
+add comment="{IXCSoft PPPOE -> rafaela.vitoriano.1090}" disabled=yes name=\
+    rafaela.vitoriano.1090 password=1vewg profile=pool_bloqueio service=pppoe
+add caller-id=18:0D:2C:00:0C:37 comment="{IXCSoft PPPOE -> tiago.henrique17}" \
+    disabled=yes name=tiago.henrique17 password=3k9nu profile=pool_bloqueio \
+    service=pppoe
+add caller-id=D8:77:8B:C6:66:58 comment="{IXCSoft PPPOE -> henrique.lopes77}" \
+    disabled=yes name=henrique.lopes77 password=l94x7 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:DD:F9:28 comment="{IXCSoft PPPOE -> fernando.luiz893}" \
+    disabled=yes name=fernando.luiz893 password=bk44a profile=pool_bloqueio \
+    service=pppoe
+add caller-id=D8:77:8B:3B:68:8C comment="{IXCSoft PPPOE -> gabriel.henrique39}" \
+    disabled=yes name=gabriel.henrique39 password=52dg4 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=D8:77:8B:96:2D:DF comment="{IXCSoft PPPOE -> willian.sousa75}" \
+    disabled=yes name=willian.sousa75 password=679td profile=pool_bloqueio \
+    service=pppoe
+add caller-id=CC:32:E5:1E:E9:D2 comment="{IXCSoft PPPOE -> debora.vitoria}" \
+    disabled=yes name=debora.vitoria password=5i6q2 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=54:9F:06:11:5B:94 comment="{IXCSoft PPPOE -> maria.madalena19}" \
+    disabled=yes name=maria.madalena19 password=29xr1 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=30:CC:21:15:B7:EF comment=\
+    "{IXCSoft PPPOE -> francisco.chiquete16}" disabled=yes name=\
+    francisco.chiquete16 password=demlj profile=pool_bloqueio service=pppoe
+add caller-id=18:0D:2C:D7:1D:76 comment="{IXCSoft PPPOE -> ronaldo.posto47}" \
+    disabled=yes name=ronaldo.posto47 password=u9vyq profile=pool_bloqueio \
+    service=pppoe
+add caller-id=FC:40:09:0C:3D:26 comment="{IXCSoft PPPOE -> valeria.silva62}" \
+    disabled=yes name=valeria.silva62 password=536f3 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=98:DA:C4:41:60:4D comment="{IXCSoft PPPOE -> robson.ribeiro91}" \
+    disabled=yes name=robson.ribeiro91 password=ma9h5 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:D8:67:E2 comment="{IXCSoft PPPOE -> maria.eduarda01}" \
+    disabled=yes name=maria.eduarda01 password=1f5e1 profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> rosa.maria72}" disabled=yes name=rosa.maria72 \
+    password=ppe59 profile=pool_bloqueio service=pppoe
+add caller-id=FC:40:09:10:66:B6 comment="{IXCSoft PPPOE -> isabella.lula}" \
+    disabled=yes name=isabella.lula password=nv934 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=5C:3A:3D:88:C3:CB comment="{IXCSoft PPPOE -> valdir.aparecido}" \
+    disabled=yes name=valdir.aparecido password=42r9g profile=pool_bloqueio \
+    service=pppoe
+add caller-id=10:47:38:A1:89:E7 comment="{IXCSoft PPPOE -> rogerio.luiz33}" \
+    disabled=yes name=rogerio.luiz33 password=16577 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=AC:A4:6E:CD:88:F6 comment=\
+    "{IXCSoft PPPOE -> doralice.teixeira66}" disabled=yes name=\
+    doralice.teixeira66 password=d776m profile=pool_bloqueio service=pppoe
+add caller-id=44:D9:E7:C0:90:20 comment="{IXCSoft PPPOE -> helaine.moraes77}" \
+    disabled=yes name=helaine.moraes77 password=1xg94 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:D9:E7:70:7B:3F comment="{IXCSoft PPPOE -> aldair.sousa66}" \
+    disabled=yes name=aldair.sousa66 password=9m1an profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:38:86:D2 comment="{IXCSoft PPPOE -> vanusa.regina}" \
+    disabled=yes name=vanusa.regina password=f6w2c profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:FD:0D:5D:46:95 comment="{IXCSoft PPPOE -> francieli.alvez}" \
+    disabled=yes name=francieli.alvez password=9zj7e profile=pool_bloqueio \
+    service=pppoe
+add caller-id=58:3B:D9:00:00:10 comment="{IXCSoft PPPOE -> helen.gomes30}" \
+    disabled=yes name=helen.gomes30 password=e53ez profile=pool_bloqueio \
+    service=pppoe
+add caller-id=0C:6A:BC:7D:FE:50 comment="{IXCSoft PPPOE -> juliano.fogaca74}" \
+    disabled=yes name=juliano.fogaca74 password=sf596 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:3B:32:40:AB:ED comment="{IXCSoft PPPOE -> samuel.fostim75}" \
+    disabled=yes name=samuel.fostim75 password=m4pwt profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:FD:0D:BC:3E:32 comment="{IXCSoft PPPOE -> aparecido.ferreira}" \
+    disabled=yes name=aparecido.ferreira password=b19e5 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=3C:FB:5C:11:6C:90 comment=\
+    "{IXCSoft PPPOE -> alexandro.luciano86}" disabled=yes name=\
+    alexandro.luciano86 password=1c531 profile=pool_bloqueio service=pppoe
+add caller-id=74:E1:9A:3F:41:D0 comment="{IXCSoft PPPOE -> rafael.chagas89}" \
+    disabled=yes name=rafael.chagas89 password=q8igh profile=pool_bloqueio \
+    service=pppoe
+add caller-id=B0:4E:26:C9:C4:E7 comment=\
+    "{IXCSoft PPPOE -> valdelice.oliveira01}" disabled=yes name=\
+    valdelice.oliveira01 password=62wm1 profile=pool_bloqueio service=pppoe
+add caller-id=30:42:40:D1:DA:FA comment="{IXCSoft PPPOE -> nathaly.silva05}" \
+    disabled=yes name=nathaly.silva05 password=kqvdd profile=pool_bloqueio \
+    service=pppoe
+add caller-id=24:FD:0D:5D:45:B3 comment="{IXCSoft PPPOE -> andre.cassemiro56}" \
+    disabled=yes name=andre.cassemiro56 password=f9phi profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:3B:32:23:F7:C6 comment="{IXCSoft PPPOE -> kaylane.ludmila70}" \
+    disabled=yes name=kaylane.ludmila70 password=j59cq profile=\
+    Combo_TorreTV_520_MB service=pppoe
+add caller-id=98:00:6A:47:39:A0 comment="{IXCSoft PPPOE -> viviane.bispo860}" \
+    disabled=yes name=viviane.bispo860 password=3q172 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:D6:87:89 comment="{IXCSoft PPPOE -> livia.camargo03}" \
+    disabled=yes name=livia.camargo03 password=dt4fs profile=pool_bloqueio \
+    service=pppoe
+add caller-id=00:BE:9E:55:92:40 comment="{IXCSoft PPPOE -> plinio.formigoni4}" \
+    disabled=yes name=plinio.formigoni4 password=p831p profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E0:19:54:E1:6B:84 comment="{IXCSoft PPPOE -> alessandro.bisso43}" \
+    disabled=yes name=alessandro.bisso43 password=2jmlq profile=pool_bloqueio \
+    service=pppoe
+add caller-id=0C:6A:BC:94:F5:E0 comment="{IXCSoft PPPOE -> francini.jacinto73}" \
+    disabled=yes name=francini.jacinto73 password=ke6wy profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:18:D6:AA:BD:6E comment="{IXCSoft PPPOE -> gerson.aparecido91}" \
+    disabled=yes name=gerson.aparecido91 password=y96g7 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=3C:FB:5C:11:56:70 comment="{IXCSoft PPPOE -> damiao.27}" \
+    disabled=yes name=damiao.27 password=mnj44 profile=pool_bloqueio service=\
+    pppoe
+add caller-id=04:25:E0:EA:2A:87 comment="{IXCSoft PPPOE -> murillo.felipe16}" \
+    disabled=yes name=murillo.felipe16 password=x7zwz profile=pool_bloqueio \
+    service=pppoe
+add caller-id=94:E3:EE:27:A5:A4 comment="{IXCSoft PPPOE -> luana.silva}" \
+    disabled=yes name=luana.silva password=ad588 profile=pool_bloqueio service=\
+    pppoe
+add comment="{IXCSoft PPPOE -> everaldo.berto40}" disabled=yes name=\
+    everaldo.berto40 password=g7455 profile=pool_bloqueio service=pppoe
+add comment="{IXCSoft PPPOE -> ana.lucia98}" disabled=yes name=ana.lucia98 \
+    password=5xxgx profile=pool_bloqueio service=pppoe
+add caller-id=00:E0:4C:C4:4C:6F comment="{IXCSoft PPPOE -> isabela.pereira17}" \
+    disabled=yes name=isabela.pereira17 password=577yu profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E8:9E:0C:00:5E:F9 comment="{IXCSoft PPPOE -> tamires.macedo38}" \
+    disabled=yes name=tamires.macedo38 password=hiwp8 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=54:51:1B:EA:EF:62 comment="{IXCSoft PPPOE -> rosana.maiara44}" \
+    disabled=yes name=rosana.maiara44 password=31566 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:00:02:35 comment="{IXCSoft PPPOE -> talia.boatto879}" \
+    disabled=yes name=talia.boatto879 password=4q36k profile=pool_bloqueio \
+    service=pppoe
+add caller-id=D8:77:8B:3B:59:F6 comment="{IXCSoft PPPOE -> ingrid.ribeiro58}" \
+    disabled=yes name=ingrid.ribeiro58 password=mi16a profile=pool_bloqueio \
+    service=pppoe
+add caller-id=C4:47:3F:3E:AC:E5 comment="{IXCSoft PPPOE -> lucas.oliveira73}" \
+    disabled=yes name=lucas.oliveira73 password=a81rk profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:38:87:00 comment=\
+    "{IXCSoft PPPOE -> wellington.moraes99}" disabled=yes name=\
+    wellington.moraes99 password=3m917 profile=pool_bloqueio service=pppoe
+add caller-id=24:FD:0D:5D:46:C3 comment="{IXCSoft PPPOE -> marcos.freitas12}" \
+    disabled=yes name=marcos.freitas12 password=4pq4v profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> marcos.alexandre14}" disabled=yes name=\
+    marcos.alexandre14 password=3p4t8 profile=pool_bloqueio service=pppoe
+add caller-id=24:CA:CB:97:57:40 comment="{IXCSoft PPPOE -> andre.silva21}" \
+    disabled=yes name=andre.silva21 password=5ad1k profile=pool_bloqueio \
+    service=pppoe
+add caller-id=74:E1:9A:43:B7:D0 comment="{IXCSoft PPPOE -> elisabeth.fatima23}" \
+    disabled=yes name=elisabeth.fatima23 password=3v39n profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> ana.maria41}" disabled=yes name=ana.maria41 \
+    password=heiiw profile=pool_bloqueio service=pppoe
+add caller-id=74:E1:9A:4A:1C:A0 comment="{IXCSoft PPPOE -> milton.filho820}" \
+    disabled=yes name=milton.filho820 password=111qd profile=\
+    Bofete_Fibra_520MB_PF service=pppoe
+add caller-id=44:3B:32:23:C7:03 comment=\
+    "{IXCSoft PPPOE -> aparecida.eburneo72}" disabled=yes name=\
+    aparecida.eburneo72 password=b6qzq profile=pool_bloqueio service=pppoe
+add caller-id=70:CD:91:90:DD:08 comment="{IXCSoft PPPOE -> reginaldo.santos36}" \
+    disabled=yes name=reginaldo.santos36 password=al7dp profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> willian.jose93}" disabled=yes name=\
+    willian.jose93 password=xijn3 profile=pool_bloqueio service=pppoe
+add caller-id=18:0D:2C:86:AC:4A comment="{IXCSoft PPPOE -> rodrigo.jesus94}" \
+    disabled=yes name=rodrigo.jesus94 password=junr7 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=30:42:40:BE:71:E8 comment="{IXCSoft PPPOE -> nivaldo.santos24}" \
+    disabled=yes name=nivaldo.santos24 password=714ju profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:39:F9:A4 comment="{IXCSoft PPPOE -> Vera.lucia}" \
+    disabled=yes name=Vera.lucia password=32577523 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:98:29:DE comment="{IXCSoft PPPOE -> sabrina.cabral}" \
+    disabled=yes name=sabrina.cabral password=il75j profile=pool_bloqueio \
+    service=pppoe
+add caller-id=44:59:43:52:66:6C comment=\
+    "{IXCSoft PPPOE -> lucas.mateuslavarapido}" disabled=yes name=\
+    lucas.mateuslavarapido password=mxzus profile=pool_bloqueio service=pppoe
+add comment="{IXCSoft PPPOE -> gabriel.sa}" disabled=yes name=gabriel.sa \
+    password=vc279 profile=pool_bloqueio service=pppoe
+add caller-id=34:E8:94:98:31:07 comment="{IXCSoft PPPOE -> fernando.andre34}" \
+    disabled=yes name=fernando.andre34 password=13sym profile=pool_bloqueio \
+    service=pppoe
+add caller-id=CC:32:E5:56:AE:47 comment="{IXCSoft PPPOE -> sauam.mendes}" \
+    disabled=yes name=sauam.mendes password=2v81c profile=pool_bloqueio \
+    service=pppoe
+add caller-id=CC:ED:DC:C5:2C:81 comment="{IXCSoft PPPOE -> robert.ribeiro59}" \
+    disabled=yes name=robert.ribeiro59 password=6a3f6 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:50:D6:67 comment="{IXCSoft PPPOE -> kevin.willian69}" \
+    disabled=yes name=kevin.willian69 password=784u1 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=00:2F:D9:6B:12:80 comment="{IXCSoft PPPOE -> rodrigo.lima72}" \
+    disabled=yes name=rodrigo.lima72 password=31fi4 profile=\
+    Bofete_Fibra_520MB_PF service=pppoe
+add caller-id=78:17:35:EF:5E:21 comment="{IXCSoft PPPOE -> manoel.junior847}" \
+    disabled=yes name=manoel.junior847 password=b8428 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:BC:6D:18 comment="{IXCSoft PPPOE -> noemia.bezerra10}" \
+    disabled=yes name=noemia.bezerra10 password=f5x6d profile=pool_bloqueio \
+    service=pppoe
+add caller-id=D8:77:8B:96:2E:41 comment="{IXCSoft PPPOE -> weberth.viana06}" \
+    disabled=yes name=weberth.viana06 password=97xc3 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=78:17:35:ED:D5:34 comment=\
+    "{IXCSoft PPPOE -> fernando.armelindo69}" disabled=yes name=\
+    fernando.armelindo69 password=zgdg1 profile=pool_bloqueio service=pppoe
+add caller-id=D8:77:8B:3B:6A:EA comment="{IXCSoft PPPOE -> edson.jose80}" \
+    disabled=yes name=edson.jose80 password=3f145 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=70:CD:91:77:AA:C8 comment="{IXCSoft PPPOE -> gustavo.silva33}" \
+    disabled=yes name=gustavo.silva33 password=r9as4 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:25:E0:E8:6D:14 comment="{IXCSoft PPPOE -> fabiano.almeida62}" \
+    disabled=yes name=fabiano.almeida62 password=wnp96 profile=pool_bloqueio \
+    service=pppoe
+add comment="{IXCSoft PPPOE -> stefania.lira66}" disabled=yes name=\
+    stefania.lira66 password=liii4 profile=pool_bloqueio service=pppoe
+add caller-id=18:0D:2C:D0:9E:02 comment="{IXCSoft PPPOE -> margarida.bispo47}" \
+    disabled=yes name=margarida.bispo47 password=67k69 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=58:3B:D9:03:19:60 comment="{IXCSoft PPPOE -> paulo.roberto03}" \
+    disabled=yes name=paulo.roberto03 password=56xe7 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=AC:37:28:9C:8D:D4 comment="{IXCSoft PPPOE -> michel.oliveira90}" \
+    disabled=yes name=michel.oliveira90 password=9s5u3 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=EC:8A:C7:80:B4:70 comment="{IXCSoft PPPOE -> michel.candido91}" \
+    disabled=yes name=michel.candido91 password=zkmee profile=pool_bloqueio \
+    service=pppoe
+add caller-id=28:BF:89:C4:5C:C0 comment="{IXCSoft PPPOE -> jailton.reino28}" \
+    disabled=yes name=jailton.reino28 password=8nt1n profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:C9:74:02 comment="{IXCSoft PPPOE -> sonia.regina44}" \
+    disabled=yes name=sonia.regina44 password=98udl profile=pool_bloqueio \
+    service=pppoe
+add caller-id=70:4F:57:1C:50:D5 comment="{IXCSoft PPPOE -> sauam.ponto02}" \
+    disabled=yes name=sauam.ponto02 password=mqc2y profile=pool_bloqueio \
+    service=pppoe
+add caller-id=58:3B:D9:FD:21:C0 comment="{IXCSoft PPPOE -> jose.henrique17}" \
+    disabled=yes name=jose.henrique17 password=5127v profile=pool_bloqueio \
+    service=pppoe
+add caller-id=AC:A4:6E:C9:B3:A4 comment="{IXCSoft PPPOE -> luana.floricultura}" \
+    disabled=yes name=luana.floricultura password=2txc5 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:D0:9E:34 comment="{IXCSoft PPPOE -> suzana.almeida32}" \
+    disabled=yes name=suzana.almeida32 password=xdt58 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=8C:DC:02:5D:40:59 comment="{IXCSoft PPPOE -> alan.francisco43}" \
+    disabled=yes name=alan.francisco43 password=vrqb5 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=88:B3:62:84:B0:94 comment="{IXCSoft PPPOE -> lucas.lopes44}" \
+    disabled=yes name=lucas.lopes44 password=24t33 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=18:0D:2C:86:AC:42 comment="{IXCSoft PPPOE -> rafaela.juvencio63}" \
+    disabled=yes name=rafaela.juvencio63 password=972a9 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=04:25:E0:AE:9E:64 comment="{IXCSoft PPPOE -> kaneko.kaneko}" \
+    disabled=yes name=kaneko.kaneko password=kaneko profile=pool_bloqueio \
+    service=pppoe
+add caller-id=E8:9E:0C:00:89:89 comment="{IXCSoft PPPOE -> joao.batista00}" \
+    disabled=yes name=joao.batista00 password=9jts4 profile=pool_bloqueio \
+    service=pppoe
+add caller-id=CC:32:E5:56:AE:47 comment="{IXCSoft PPPOE -> paulo.cesar445}" \
+    disabled=yes name=paulo.cesar445 password=9176v profile=pool_bloqueio \
+    service=pppoe
+/radius
+add address=167.172.106.53 disabled=yes secret=testing123 service=ppp,hotspot
+add address=207.248.10.142 comment="IXCProvedor configuracao radius" secret=\
+    ixcradius service=ppp,hotspot,wireless src-address=10.255.255.4 timeout=3s
+/radius incoming
+set accept=yes
+/routing filter
+add action=discard chain=ospf-in disabled=yes prefix=200.187.80.226 \
+    prefix-length=32
+/routing ospf area range
+add area=area1 range=100.65.96.0/21
+/routing ospf interface
+add interface=Loopback
+add interface=VLAN-1002-LINK-BFT1 network-type=point-to-point
+add cost=100 interface=VLAN-1001-LINK-PBG-BKP-IN-OUT network-type=\
+    point-to-point
+add passive=yes
+/routing ospf network
+add area=backbone network=10.255.255.4/32
+add area=backbone network=172.30.0.20/30
+add area=backbone network=172.30.0.16/30
+add area=area1 network=100.65.96.0/22
+/snmp
+set enabled=yes trap-generators=interfaces trap-interfaces=all trap-version=2
+/system clock
+set time-zone-name=America/Sao_Paulo
+/system identity
+set name=002-RT-BNG-BFT-002
+/system ntp client
+set enabled=yes primary-ntp=200.160.0.8
+/system resource irq rps
+set sfp-sfpplus1 disabled=no
+set sfp-sfpplus2 disabled=no
+set sfp-sfpplus3 disabled=no
+set sfp-sfpplus4 disabled=no
+set sfp-sfpplus5 disabled=no
+set sfp-sfpplus6 disabled=no
+set sfp-sfpplus7 disabled=no
+set sfp-sfpplus8 disabled=no
+set sfp-sfpplus9 disabled=no
+set sfp-sfpplus10 disabled=no
+set sfp-sfpplus11 disabled=no
+set sfp-sfpplus12 disabled=no
+set sfp28-1 disabled=no
+set sfp28-2 disabled=no
+/system scheduler
+add interval=1d name=IXCProvedor_agendamento-backup on-event=\
+    IXCProvedor-fazer-e-enviar-backup policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive start-date=\
+    nov/18/2022 start-time=04:00:00
+add interval=1d name=bkp_ftp_procyon on-event=bkpprocyon policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon \
+    start-date=nov/17/2023 start-time=04:00:00
+/system script
+add dont-require-permissions=no name=IXCProvedor-fazer-e-enviar-backup owner=\
+    ixcixc policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive \
+    source="export file=backup-mikrotik_ARTNET_CONCENTRADOR_BFT__02.rsc; :log in\
+    fo message=\"IXCSoft enviando backup por email\"; /tool e-mail send to=\"des\
+    tino@email.com\" subject=\"backup-ARTNET_CONCENTRADOR_BFT__02\" file=backup-\
+    mikrotik_ARTNET_CONCENTRADOR_BFT__02.rsc start-tls=yes"
+add dont-require-permissions=no name=bkpprocyon owner=gabriel policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source=":lo\
+    cal ftpPath \"/Mikrotiks/ARTNET\" \r\
+    \n:local backupFileName (\"backup-\" . [:pick [/system clock get date] 7 11]\
+    \_. [:pick [/system clock get date] 0 3] . [:pick [/system clock get date] 4\
+    \_6] . \"-\" . [/system identity get name] . \".rsc\")\r\
+    \n\r\
+    \n# Cria o backup\r\
+    \n/export file=\$backupFileName\r\
+    \n\r\
+    \ntool fetch address=191.252.193.112 mode=ftp user=bkpprocyon password=procy\
+    on1q2w src-path=\$\"backupFileName\" dst-path=(\$ftpPath . \"/\" . \$backupF\
+    ileName) upload=yes\r\
+    \ndelay 10s\r\
+    \n/file remove \$backupFileName"
+/tool e-mail
+set address=mail.artnettelecom.com.br from=suporte@artnettelecom.com.br \
+    password=@#Bol192 port=465 user=suporte@artnettelecom.com.br
+/tool graphing interface
+add
+/tool netwatch
+add comment="{IXCSoft Netwatch}" down-script="/ppp secret ; :foreach i in [ find\
+    \_comment~\"IXCSoft PPPOE\" ] do={ enable  \$i };" host=207.248.10.142 \
+    interval=5m up-script="/ppp secret ; :foreach i in [ find comment~\"IXCSoft \
+    PPPOE\" ] do={ disable \$i }; /ppp active; :foreach p in [find comment~\"IXC\
+    Soft\"] do={ remove \$p; :delay 1};"
+/tool romon
+set enabled=yes
+/tool romon port
+add disabled=no forbid=yes interface=sfp-sfpplus2
+[hemily@002-RT-BNG-BFT-002] > 
