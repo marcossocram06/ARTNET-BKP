@@ -1,0 +1,87 @@
+
+
+
+
+
+
+
+
+
+
+  MMM      MMM       KKK                          TTTTTTTTTTT      KKK
+  MMMM    MMMM       KKK                          TTTTTTTTTTT      KKK
+  MMM MMMM MMM  III  KKK  KKK  RRRRRR     OOOOOO      TTT     III  KKK  KKK
+  MMM  MM  MMM  III  KKKKK     RRR  RRR  OOO  OOO     TTT     III  KKKKK
+  MMM      MMM  III  KKK KKK   RRRRRR    OOO  OOO     TTT     III  KKK KKK
+  MMM      MMM  III  KKK  KKK  RRR  RRR   OOOOOO      TTT     III  KKK  KKK
+
+  MikroTik RouterOS 6.49.7 (c) 1999-2022       http://www.mikrotik.com/
+
+[?]             Gives the list of available commands
+command [?]     Gives help on the command and list of arguments
+
+[Tab]           Completes the command/word. If the input is ambiguous,
+                a second [Tab] gives possible options
+
+/               Move up to base level
+..              Move up one level
+/command        Use command at the base level
+(85 messages not shown)
+feb/28/1970 09:06:01 system,error,critical router rebooted without proper shutdown
+, probably power outage
+feb/28/1970 09:06:02 system,error,critical router rebooted without proper shutdown
+, probably power outage
+feb/28/1970 09:06:02 system,error,critical router rebooted without proper shutdown
+, probably power outage
+mar/04/1970 09:06:01 system,error,critical router rebooted without proper shutdown
+, probably power outage
+mar/04/1970 09:06:02 system,error,critical router rebooted without proper shutdown
+, probably power outage
+mar/04/1970 09:06:02 system,error,critical router rebooted without proper shutdown
+, probably power outage
+mar/04/1970 09:06:02 system,error,critical router rebooted without proper shutdown
+, probably power outage
+mar/04/1970 09:06:02 system,error,critical router rebooted without proper shutdown
+, probably power outage
+[hemily@PTP Piramboia] > export 
+# mar/06/1970 02:32:10 by RouterOS 6.49.7
+# software id = GIED-X1H0
+#
+# model = RB760iGS
+# serial number = HE108SZFRE9
+/interface bridge
+add name=bridge1
+/interface ethernet
+set [ find default-name=ether1 ] comment="Entrada mimosa"
+set [ find default-name=sfp1 ] comment="Sida LinkOLT"
+/interface vlan
+add interface=ether1 name=vlan2049 vlan-id=2049
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=MikroTik
+/interface bridge port
+add bridge=bridge1 interface=vlan2049
+add bridge=bridge1 interface=ether2
+add bridge=bridge1 interface=ether3
+add bridge=bridge1 interface=ether4
+add bridge=bridge1 interface=ether5
+add bridge=bridge1 interface=sfp1
+/interface pppoe-server server
+# Service is on a slave interface
+add disabled=no interface=sfp1 service-name=service1
+/ip address
+add address=192.168.40.1/24 interface=bridge1 network=192.168.40.0
+add address=192.168.147.2/24 interface=ether1 network=192.168.147.0
+/ip route
+add distance=1 gateway=192.168.147.1
+/ip service
+set telnet disabled=yes
+set ftp disabled=yes
+set www disabled=yes
+set ssh disabled=yes
+set api disabled=yes
+set api-ssl disabled=yes
+/system identity
+set name="PTP Piramboia"
+/tool romon
+set enabled=yes
+[hemily@PTP Piramboia] > 
