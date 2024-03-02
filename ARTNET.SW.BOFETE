@@ -1,0 +1,254 @@
+
+
+
+
+
+
+
+
+
+
+  MMM      MMM       KKK                          TTTTTTTTTTT      KKK
+  MMMM    MMMM       KKK                          TTTTTTTTTTT      KKK
+  MMM MMMM MMM  III  KKK  KKK  RRRRRR     OOOOOO      TTT     III  KKK  KKK
+  MMM  MM  MMM  III  KKKKK     RRR  RRR  OOO  OOO     TTT     III  KKKKK
+  MMM      MMM  III  KKK KKK   RRRRRR    OOO  OOO     TTT     III  KKK KKK
+  MMM      MMM  III  KKK  KKK  RRR  RRR   OOOOOO      TTT     III  KKK  KKK
+
+  MikroTik RouterOS 6.44.5 (c) 1999-2019       http://www.mikrotik.com/
+
+[?]             Gives the list of available commands
+command [?]     Gives help on the command and list of arguments
+
+[Tab]           Completes the command/word. If the input is ambiguous,
+                a second [Tab] gives possible options
+
+/               Move up to base level
+..              Move up one level
+/command        Use command at the base level
+(24878 messages not shown)
+jan/18/2024 09:55:13 system,error,critical login failure for user mercia by romon 
+64:D1:54:EA:9B:36 via winbox
+jan/18/2024 09:55:37 system,error,critical login failure for user mercia by romon 
+64:D1:54:EA:9B:36 via winbox
+jan/18/2024 09:56:13 system,error,critical login failure for user mercia by romon 
+64:D1:54:EA:9B:36 via winbox
+feb/02/2024 15:51:26 system,error,critical login failure for user paula by romon 6
+4:D1:54:EA:9B:36 via winbox
+feb/02/2024 15:51:28 system,error,critical login failure for user paula by romon 6
+4:D1:54:EA:9B:36 via winbox
+feb/17/2024 15:13:13 system,error,critical login failure for user paula by romon 6
+4:D1:54:EA:9B:36 via winbox
+feb/17/2024 15:14:16 system,error,critical login failure for user paula by romon 6
+4:D1:54:EA:9B:36 via winbox
+feb/27/2024 16:04:56 system,error,critical login failure for user mercia by romon 
+64:D1:54:EA:9B:36 via winbox
+[hemily@ARTNET.SW.BOFETE] > export 
+# mar/02/2024 11:00:21 by RouterOS 6.44.5
+# software id = 5TLA-LG1C
+#
+# model = CRS309-1G-8S+
+# serial number = BE140B4275B1
+/interface bridge
+add frame-types=admit-only-vlan-tagged name=BridgeGeral protocol-mode=none \
+    vlan-filtering=yes
+/interface ethernet
+set [ find default-name=sfp-sfpplus1 ] name=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01"
+set [ find default-name=sfp-sfpplus2 ] name="sfp-sfpplus2 - OLT ZTE"
+set [ find default-name=sfp-sfpplus3 ] name="sfp-sfpplus3 - SERVIDOR"
+set [ find default-name=sfp-sfpplus4 ] name="sfp-sfpplus4 - CONCENTRADOR BFT2"
+set [ find default-name=sfp-sfpplus6 ] auto-negotiation=no name=\
+    "sfp-sfpplus6 - PTP-ALPES"
+set [ find default-name=sfp-sfpplus7 ] advertise="10M-half,10M-full,100M-half,10\
+    0M-full,1000M-half,1000M-full,2500M-full,5000M-full,10000M-full" name=\
+    "sfp-sfpplus7 - PTP PORANGABA" speed=10Gbps
+set [ find default-name=sfp-sfpplus8 ] auto-negotiation=no name=\
+    "sfp-sfpplus8 - PTP VALE VERDE"
+/interface vlan
+add comment=Ger-Switch interface=BridgeGeral name=vlan98 vlan-id=98
+add disabled=yes interface="sfp-sfpplus6 - PTP-ALPES" name="vlan111 speednet" \
+    vlan-id=111
+add interface="sfp-sfpplus1 - CONCENTRADOR-BFT_01" name=vlan999 vlan-id=999
+/interface list
+add name=WAN
+add name=LAN
+/interface wireless security-profiles
+set [ find default=yes ] supplicant-identity=MikroTik
+/ip hotspot profile
+set [ find default=yes ] html-directory=flash/hotspot
+/port
+set 0 baud-rate=9600
+/routing ospf instance
+set [ find default=yes ] redistribute-connected=as-type-1 redistribute-static=\
+    as-type-1 router-id=10.255.255.77
+/snmp community
+add addresses=172.16.116.1/32 name=SGP-GRAPHICs
+/interface bridge port
+add bridge=BridgeGeral interface="sfp-sfpplus1 - CONCENTRADOR-BFT_01"
+add bridge=BridgeGeral frame-types=admit-only-vlan-tagged interface=\
+    "sfp-sfpplus2 - OLT ZTE"
+add bridge=BridgeGeral interface="sfp-sfpplus8 - PTP VALE VERDE" pvid=97
+add bridge=BridgeGeral interface="sfp-sfpplus4 - CONCENTRADOR BFT2"
+add bridge=BridgeGeral interface="sfp-sfpplus7 - PTP PORANGABA" pvid=19
+add bridge=BridgeGeral frame-types=admit-only-untagged-and-priority-tagged \
+    interface="sfp-sfpplus3 - SERVIDOR" pvid=999
+add bridge=BridgeGeral interface=ether1 pvid=2100
+add bridge=BridgeGeral frame-types=admit-only-vlan-tagged interface=\
+    "sfp-sfpplus6 - PTP-ALPES"
+/ip neighbor discovery-settings
+set discover-interface-list=all
+/interface bridge vlan
+add bridge=BridgeGeral disabled=yes tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus8 - PTP VALE VERDE" \
+    vlan-ids=2020
+add bridge=BridgeGeral tagged="sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus2 -\
+    \_OLT ZTE,sfp-sfpplus4 - CONCENTRADOR BFT2" vlan-ids=\
+    2000,105,2050,2001,15,50,51,52,53,54,1010,2003,3000,3001,3002,3003,3004
+add bridge=BridgeGeral tagged="sfp-sfpplus1 - CONCENTRADOR-BFT_01" untagged=\
+    "sfp-sfpplus3 - SERVIDOR" vlan-ids=999
+add bridge=BridgeGeral tagged="sfp-sfpplus1 - CONCENTRADOR-BFT_01,BridgeGeral" \
+    vlan-ids=98
+add bridge=BridgeGeral tagged="sfp-sfpplus1 - CONCENTRADOR-BFT_01" untagged=\
+    "sfp-sfpplus8 - PTP VALE VERDE" vlan-ids=97
+add bridge=BridgeGeral tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus7 - PTP PORANGABA" vlan-ids=\
+    810
+add bridge=BridgeGeral tagged=\
+    "sfp-sfpplus7 - PTP PORANGABA,sfp-sfpplus4 - CONCENTRADOR BFT2" vlan-ids=\
+    1001
+add bridge=BridgeGeral tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus4 - CONCENTRADOR BFT2" \
+    vlan-ids=1002
+add bridge=BridgeGeral tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus4 - CONCENTRADOR BFT2" \
+    vlan-ids=1003
+add bridge=BridgeGeral tagged="sfp-sfpplus2 - OLT ZTE,sfp-sfpplus1 - CONCENTRADO\
+    R-BFT_01,sfp-sfpplus4 - CONCENTRADOR BFT2" untagged=ether1 vlan-ids=2100
+add bridge=BridgeGeral comment=CLIENTES-PPPoE tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus6 - PTP-ALPES" vlan-ids=350
+add bridge=BridgeGeral tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus4 - CONCENTRADOR BFT2" \
+    vlan-ids=2053
+add bridge=BridgeGeral tagged=\
+    "sfp-sfpplus1 - CONCENTRADOR-BFT_01,sfp-sfpplus2 - OLT ZTE" vlan-ids=\
+    899-900
+/interface l2tp-server server
+set enabled=yes use-ipsec=yes
+/interface list member
+add interface=BridgeGeral list=LAN
+add interface=ether1 list=WAN
+/interface pptp-server server
+set enabled=yes
+/interface sstp-server server
+set default-profile=default-encryption enabled=yes
+/ip accounting
+set enabled=yes
+/ip address
+add address=10.69.0.2/30 interface=vlan98 network=10.69.0.0
+/ip cloud
+set ddns-enabled=yes update-time=no
+/ip dhcp-client
+# DHCP client can not run on slave interface!
+add dhcp-options=hostname,clientid disabled=no interface=ether1
+/ip dhcp-server network
+add address=10.12.12.0/24 dns-server=8.8.8.8,1.1.1.1 gateway=10.12.12.1 \
+    netmask=24
+/ip dns
+set servers=8.8.8.8,1.1.1.1
+/ip firewall address-list
+add address=177.52.36.138 list=SITES-LIBERADOS
+add address=208.67.222.222 list=SITES-LIBERADOS
+add address=208.67.222.220 list=SITES-LIBERADOS
+add address=8.8.8.8 list=SITES-LIBERADOS
+add address=8.8.4.4 list=SITES-LIBERADOS
+add address=1.1.1.1 list=SITES-LIBERADOS
+add address=10.24.0.0/20 list=BLOQUEADOS
+/ip route
+add distance=1 gateway=10.69.0.1
+/ip service
+set telnet disabled=yes
+set ftp address=191.252.60.142/32
+set www port=8010
+set ssh disabled=yes
+set api address=191.252.60.142/32 port=3540
+/ppp aaa
+set interim-update=5m use-radius=yes
+/ppp profile
+set *FFFFFFFE local-address=192.168.89.1 remote-address=*3
+/radius
+add accounting-port=3213 address=172.16.116.1 authentication-port=3212 comment=\
+    "RADIUS SGP" secret=sgp@radius service=ppp,login,dhcp timeout=3s
+add address=10.11.11.2 secret=123456 service=ppp src-address=168.181.63.56 \
+    timeout=3s
+/radius incoming
+set accept=yes
+/routing ospf interface
+add passive=yes
+/routing ospf network
+add area=backbone network=10.255.255.77/32
+add area=backbone network=168.181.63.56/29
+add area=backbone network=168.181.63.56/32
+/snmp
+set enabled=yes trap-community=SGP-GRAPHICs trap-version=2
+/system clock
+set time-zone-autodetect=no
+/system clock manual
+set time-zone=-03:00
+/system console
+set [ find ] disabled=yes
+/system identity
+set name=ARTNET.SW.BOFETE
+/system logging
+set 0 topics=info,!account
+/system ntp client
+set enabled=yes primary-ntp=201.49.148.135 secondary-ntp=201.49.148.135 \
+    server-dns-names=1.1.1.1
+/system routerboard settings
+set boot-os=router-os
+/system scheduler
+add interval=1h name=sgp-aviso on-event=sgp-aviso policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive start-date=\
+    may/29/2017 start-time=01:00:00
+add interval=1d name=bkp_ftp_procyon on-event=bkpprocyon policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon \
+    start-date=nov/17/2023 start-time=04:00:00
+/system script
+add dont-require-permissions=no name=sgp-aviso owner=poio policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive source=":log info\
+    \_\"sgp aviso\";\r\
+    \n/file remove [find where name=sgp_aviso.rsc]\r\
+    \n/toolfetchurl=\"https://inovafibrasp.sgp.net.br/ws/mikrotik/aviso/pendenci\
+    a/\\\?token=fdef71f1-603e-40e4-a8db-85facd88cf2e&app=mikrotik\" dst-path=sgp\
+    _aviso.rsc;\r\
+    \n:delay 30s\r\
+    \nimport file-name=sgp_aviso.rsc;\r\
+    \n:delay 10s\r\
+    \n/ip firewall address-list set timeout=00:30:00 [/ip firewall address-list \
+    find list=BLOQUEIO-AVISAR]"
+add dont-require-permissions=no name=bkpprocyon owner=gabriel policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source=":lo\
+    cal ftpPath \"/Mikrotiks/ARTNET\" \r\
+    \n:local backupFileName (\"backup-\" . [:pick [/system clock get date] 7 11]\
+    \_. [:pick [/system clock get date] 0 3] . [:pick [/system clock get date] 4\
+    \_6] . \"-\" . [/system identity get name] . \".rsc\")\r\
+    \n\r\
+    \n# Cria o backup\r\
+    \n/export file=\$backupFileName\r\
+    \n\r\
+    \ntool fetch address=191.252.193.112 mode=ftp user=bkpprocyon password=procy\
+    on1q2w src-path=\$\"backupFileName\" dst-path=(\$ftpPath . \"/\" . \$backupF\
+    ileName) upload=yes\r\
+    \ndelay 10s\r\
+    \n/file remove \$backupFileName"
+/tool graphing interface
+add allow-address=172.16.116.1/32
+/tool graphing queue
+add allow-address=172.16.116.1/32
+/tool graphing resource
+add allow-address=172.16.116.1/32
+/tool romon
+set enabled=yes
+/user aaa
+set use-radius=yes
+[hemily@ARTNET.SW.BOFETE] > 
